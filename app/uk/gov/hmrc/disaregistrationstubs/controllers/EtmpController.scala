@@ -27,9 +27,9 @@ import java.util.UUID
 import javax.inject.Inject
 
 class EtmpController @Inject() (
-                                 cc: ControllerComponents
-                               ) extends BackendController(cc)
-  with Logging {
+  cc: ControllerComponents
+) extends BackendController(cc)
+    with Logging {
 
   def submitEnrolment(): Action[JsValue] = Action(parse.json) { implicit request =>
     request.body.validate[JourneyData] match {
@@ -52,4 +52,3 @@ class EtmpController @Inject() (
     }
   }
 }
-
