@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaregistrationstubs.config
+package uk.gov.hmrc.disaregistrationstubs.models.journeyData
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import play.api.libs.json.{Json, OFormat}
 
-@Singleton
-class AppConfig @Inject() (config: Configuration) {
+case class OutsourcedAdministration(dataItem: Option[String], dataItem2: Option[String])
 
-  val appName: String = config.get[String]("appName")
+object OutsourcedAdministration {
+  implicit val format: OFormat[OutsourcedAdministration] = Json.format[OutsourcedAdministration]
 }

@@ -12,6 +12,7 @@ lazy val microservice = Project("disa-registration-stubs", file("."))
     scalacOptions += "-Wconf:src=routes/.*:s"
   )
   .settings(CodeCoverageSettings.settings *)
+  .settings(PlayKeys.playDefaultPort := 1203)
 
 addCommandAlias("prePrChecks", ";scalafmtCheckAll;scalafmtSbtCheck")
 lazy val it = project
