@@ -3,7 +3,7 @@ import sbt.*
 object AppDependencies {
 
   private val bootstrapVersion = "9.19.0"
-  private val hmrcMongoVersion = "2.10.0"
+  private val hmrcMongoVersion = "2.12.0"
 
   val compile: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"       %% "bootstrap-backend-play-30" % bootstrapVersion,
@@ -15,5 +15,5 @@ object AppDependencies {
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-test-play-30" % hmrcMongoVersion % Test
   )
 
-  val it: Seq[Nothing] = Seq.empty
+  def apply(): Seq[ModuleID] = compile ++ test
 }

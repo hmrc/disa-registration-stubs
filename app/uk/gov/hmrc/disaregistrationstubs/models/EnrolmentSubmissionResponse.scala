@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaregistrationstubs.config
+package uk.gov.hmrc.disaregistrationstubs.models
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import play.api.libs.json.{Json, OFormat}
 
-@Singleton
-class AppConfig @Inject() (config: Configuration) {
+case class EnrolmentSubmissionResponse(receiptId: String)
 
-  val appName: String = config.get[String]("appName")
+object EnrolmentSubmissionResponse {
+  implicit val format: OFormat[EnrolmentSubmissionResponse] = Json.format[EnrolmentSubmissionResponse]
 }

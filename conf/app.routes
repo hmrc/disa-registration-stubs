@@ -1,1 +1,3 @@
 # microservice specific routes
+
+POST    /etmp/enrolment/submission                          uk.gov.hmrc.disaregistrationstubs.controllers.EtmpController.submitEnrolment()

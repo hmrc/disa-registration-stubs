@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaregistrationstubs.config
+package uk.gov.hmrc.disaregistrationstubs.models
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.json._
 
-@Singleton
-class AppConfig @Inject() (config: Configuration) {
+case class EnrolmentSubmissionRequest(groupId: String, p2pPlatform: Option[String])
 
-  val appName: String = config.get[String]("appName")
+object EnrolmentSubmissionRequest {
+  implicit val reads: Reads[EnrolmentSubmissionRequest] = {
+    (__ \ "groupId").read[String] and
+      (__ \\ "isaProducts" \ "p2pPlatform").readNullable[String]
+  }.apply((groupId, p2pPlatform) => EnrolmentSubmissionRequest(groupId, p2pPlatform))
 }
