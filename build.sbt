@@ -1,5 +1,3 @@
-
-
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "3.3.5"
 
@@ -16,7 +14,7 @@ lazy val microservice = Project("disa-registration-stubs", file("."))
 
 addCommandAlias("prePrChecks", "scalafmtCheckAll;scalafmtSbtCheck")
 
-addCommandAlias("precommit", ";scalafmtAll;coverage;test;it/test;coverageReport")
+addCommandAlias("precommit", ";scalafmtAll;scalafmtSbt;coverage;test;it/test;coverageReport")
 
 lazy val testSettings: Seq[Def.Setting[?]] = Seq(
   fork := true,
