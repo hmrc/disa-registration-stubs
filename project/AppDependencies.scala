@@ -15,5 +15,5 @@ object AppDependencies {
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-test-play-30" % hmrcMongoVersion % Test
   )
 
-  val it: Seq[Nothing] = Seq.empty
+  def apply(): Seq[ModuleID] = compile ++ test
 }

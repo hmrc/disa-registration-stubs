@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaregistrationstubs.models.journeyData
+package uk.gov.hmrc.disaregistrationstubs.models
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.json._
 
-case class CertificatesOfAuthority(dataItem: Option[String], dataItem2: Option[String])
+case class EnrolmentSubmissionRequest(groupId: String, p2pPlatform: Option[String])
 
-object CertificatesOfAuthority {
-  implicit val format: OFormat[CertificatesOfAuthority] = Json.format[CertificatesOfAuthority]
+object EnrolmentSubmissionRequest {
+  implicit val reads: Reads[EnrolmentSubmissionRequest] = {
+    (__ \ "groupId").read[String] and
+      (__ \\ "isaProducts" \ "p2pPlatform").readNullable[String]
+  }.apply((groupId, p2pPlatform) => EnrolmentSubmissionRequest(groupId, p2pPlatform))
 }

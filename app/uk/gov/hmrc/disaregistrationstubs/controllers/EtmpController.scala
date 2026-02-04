@@ -19,8 +19,7 @@ package uk.gov.hmrc.disaregistrationstubs.controllers
 import play.api.Logging
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
-import uk.gov.hmrc.disaregistrationstubs.models.EnrolmentSubmissionResponse
-import uk.gov.hmrc.disaregistrationstubs.models.journeyData.JourneyData
+import uk.gov.hmrc.disaregistrationstubs.models.{EnrolmentSubmissionRequest, EnrolmentSubmissionResponse}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import java.util.UUID
@@ -32,17 +31,15 @@ class EtmpController @Inject() (
     with Logging {
 
   def submitEnrolment(): Action[JsValue] = Action(parse.json) { implicit request =>
-    request.body.validate[JourneyData] match {
-      case JsSuccess(journeyData, _) =>
-        val p2pPlatformOpt = journeyData.isaProducts.flatMap(_.p2pPlatform)
-
-        p2pPlatformOpt match {
+    request.body.validate[EnrolmentSubmissionRequest] match {
+      case JsSuccess(req, _) =>
+        req.p2pPlatform match {
           case Some("submit failure") =>
-            logger.info(s"Submission failure response triggered for groupId: [${journeyData.groupId}]")
+            logger.info(s"Submission failure response triggered for groupId: [${req.groupId}]")
             BadGateway(Json.obj("error" -> "Downstream error from ETMP stub"))
 
           case _ =>
-            logger.info(s"Submission successful response triggered for groupId: [${journeyData.groupId}]")
+            logger.info(s"Submission successful response triggered for groupId: [${req.groupId}]")
             Ok(Json.toJson(EnrolmentSubmissionResponse(UUID.randomUUID().toString)))
         }
 
