@@ -1,3 +1,5 @@
 # microservice specific routes
 
-POST    /etmp/enrolment/submission                          uk.gov.hmrc.disaregistrationstubs.controllers.EtmpController.submitEnrolment()
+POST    /etmp/enrolment/submission                                uk.gov.hmrc.disaregistrationstubs.controllers.EtmpController.submitEnrolment()
+
+PUT     /tax-enrolments/subscriptions/:subscriptionId/subscriber  uk.gov.hmrc.disaregistrationstubs.controllers.TaxEnrolmentController.subscribe(subscriptionId: String)

@@ -75,3 +75,16 @@ You can view further information regarding this service via our [service guide](
 ### License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
+
+
+### Endpoints
+
+#### PUT /tax-enrolments/subscriptions/:subscriptionId/subscriber
+
+| Scenario     | `credId`                             | Response           |
+| ------------ | ------------------------------------ | ------------------ |
+| Success      | anything except specific test values | `204 No Content`   |
+| Bad Request  | `tax-enrolment-bad-request`          | `400 Bad Request`  |
+| Unauthorized | auth fails or no credentials         | `401 Unauthorized` |
+
+
