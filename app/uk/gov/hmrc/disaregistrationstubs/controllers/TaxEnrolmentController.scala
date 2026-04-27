@@ -52,7 +52,7 @@ class TaxEnrolmentController @Inject() (
                   s"Parsing Tax Enrolments subscriber request failed for subscriptionId: [$subscriptionId], errors: ${JsError
                       .toJson(errors)}"
                 )
-                Future.successful(BadRequest(Json.obj("error" -> "Invalid request payload")))
+                Future.successful(BadRequest("Invalid request payload"))
             }
           case None                         =>
             logger.warn(s"No credentials returned from authorise call for subscriptionId: [$subscriptionId]")
@@ -74,7 +74,7 @@ class TaxEnrolmentController @Inject() (
         logger.info(
           s"Tax Enrolments bad request response triggered for subscriptionId: [$subscriptionId], etmpId: [${payload.etmpId}]"
         )
-        Future.successful(BadRequest(Json.obj("error" -> "Bad request from Tax Enrolments stub")))
+        Future.successful(BadRequest("Bad request from Tax Enrolments stub"))
       case _                =>
         logger.info(
           s"Tax Enrolments success response triggered for subscriptionId: [$subscriptionId], etmpId: [${payload.etmpId}]"
