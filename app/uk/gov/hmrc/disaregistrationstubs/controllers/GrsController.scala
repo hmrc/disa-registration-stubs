@@ -1,0 +1,183 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.disaregistrationstubs.controllers
+
+import play.api.libs.json.{JsObject, Json}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, AuthorisedFunctions}
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
+
+class GrsController @Inject() (
+  cc: ControllerComponents,
+  val authConnector: AuthConnector
+)(implicit ec: ExecutionContext)
+    extends BackendController(cc)
+    with AuthorisedFunctions {
+
+  def retrieveJourneyData(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
+    authorised() {
+
+      val response = journeyId match {
+
+        case "success" =>
+          Ok(
+            grsJson(
+              identifiersMatch = true,
+              bvStatus = Some("PASS"),
+              registrationStatus = "REGISTERED",
+              bpId = Some("111111")
+            )
+          )
+
+        case "identifiers-fail" =>
+          Ok(
+            grsJson(
+              identifiersMatch = false,
+              bvStatus = Some("UNCHALLENGED"),
+              registrationStatus = "REGISTRATION_FAILED"
+            )
+          )
+
+        case "bv-fail" =>
+          Ok(
+            grsJson(
+              identifiersMatch = true,
+              bvStatus = Some("FAIL"),
+              registrationStatus = "REGISTERED",
+              bpId = Some("111111")
+            )
+          )
+
+        case "bv-not-called" =>
+          Ok(
+            grsJson(
+              identifiersMatch = true,
+              bvStatus = Some("UNCHALLENGED"),
+              registrationStatus = "REGISTERED",
+              bpId = Some("111111")
+            )
+          )
+
+        case "bv-ct-enrolled" =>
+          Ok(
+            grsJson(
+              identifiersMatch = true,
+              bvStatus = Some("CT_ENROLLED"),
+              registrationStatus = "REGISTERED",
+              bpId = Some("111111")
+            )
+          )
+
+        case "registration-failed" =>
+          Ok(
+            grsJson(
+              identifiersMatch = true,
+              bvStatus = Some("UNCHALLENGED"),
+              registrationStatus = "REGISTRATION_FAILED"
+            )
+          )
+
+        case "registration-not-called" =>
+          Ok(
+            grsJson(
+              identifiersMatch = true,
+              bvStatus = None,
+              registrationStatus = "REGISTRATION_NOT_CALLED"
+            )
+          )
+
+        case "ct-utr-absent" =>
+          Ok(
+            grsJson(
+              identifiersMatch = true,
+              bvStatus = Some("FAIL"),
+              registrationStatus = "REGISTERED",
+              bpId = Some("111111"),
+              includeCtutr = false
+            )
+          )
+
+        case "grs-data-not-found" => NotFound
+        case _                    =>
+          Ok(
+            grsJson(
+              identifiersMatch = true,
+              bvStatus = Some("PASS"),
+              registrationStatus = "REGISTERED",
+              bpId = Some("111111")
+            )
+          )
+      }
+
+      Future.successful(response)
+    }
+      .recover { case _: AuthorisationException =>
+        Unauthorized
+      }
+  }
+
+  private def grsJson(
+    identifiersMatch: Boolean,
+    bvStatus: Option[String],
+    registrationStatus: String,
+    bpId: Option[String] = None,
+    includeCtutr: Boolean = true
+  ): JsObject = {
+
+    val base =
+      Json.obj(
+        "companyProfile"   -> companyProfileJson,
+        "identifiersMatch" -> identifiersMatch,
+        "registration"     -> (
+          Json.obj("registrationStatus" -> registrationStatus) ++
+            bpId.map(id => Json.obj("registeredBusinessPartnerId" -> id)).getOrElse(Json.obj())
+        )
+      )
+
+    val withBv =
+      bvStatus
+        .map(status =>
+          base ++ Json.obj(
+            "businessVerification" -> Json.obj(
+              "verificationStatus" -> status
+            )
+          )
+        )
+        .getOrElse(base)
+
+    val withCtutr =
+      if (includeCtutr) withBv ++ Json.obj("ctutr" -> "1234567890")
+      else withBv
+
+    withCtutr
+  }
+
+  private val companyProfileJson: JsObject = Json.obj(
+    "companyName"            -> "Widgets Ltd",
+    "companyNumber"          -> "12345678",
+    "dateOfIncorporation"    -> "2020-01-01",
+    "unsanitisedCHROAddress" -> Json.obj(
+      "address_line_1" -> "1 Street",
+      "address_line_2" -> "Town",
+      "locality"       -> "County",
+      "postal_code"    -> "ZX719AD"
+    )
+  )
+}

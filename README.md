@@ -68,6 +68,25 @@ sbt scalafmtSbt
 # formats just the main source files (excludes test and configuration files)
 sbt scalafmt
 ```
+
+## Endpoints
+### GET /journey/:journeyId
+Simulates the GRS/BV journey data retrieval endpoint.
+
+| Scenario                   | `journeyId`               | Response           |
+|----------------------------| ------------------------- | ------------------ |
+| Success                    | `success`                 | `200 OK`           |
+| Identifiers Mismatch       | `identifiers-fail`        | `200 OK`           |
+| Business Verification Fail | `bv-fail`                 | `200 OK`           |
+| BV Not Called              | `bv-not-called`           | `200 OK`           |
+| CT Enrolled                | `bv-ct-enrolled`          | `200 OK`           |
+| Registration Failed        | `registration-failed`     | `200 OK`           |
+| Registration Not Called    | `registration-not-called` | `200 OK`           |
+| CT UTR Absent              | `ct-utr-absent`           | `200 OK`           |
+| Not Found                  | `grs-data-not-found`      | `404 Not Found`    |
+| Unauthorized               | auth fails                | `401 Unauthorized` |
+| Success (default)          | any other value           | `200 OK`           |
+
 ### Further documentation
 
 You can view further information regarding this service via our [service guide](#).
