@@ -86,8 +86,8 @@ class TaxEnrolmentControllerSpec extends BaseUnitSpec {
         val result = route(app, request(validBody)).get
 
         status(result) mustBe BAD_REQUEST
-        contentType(result) mustBe Some("application/json")
-        (contentAsJson(result) \ "error").as[String] mustBe "Bad request from Tax Enrolments stub"
+        contentType(result) mustBe Some("text/plain")
+        contentAsString(result) mustBe "Bad request from Tax Enrolments stub"
       }
     }
 
@@ -135,8 +135,8 @@ class TaxEnrolmentControllerSpec extends BaseUnitSpec {
         val result = route(app, request(invalidBody)).get
 
         status(result) mustBe BAD_REQUEST
-        contentType(result) mustBe Some("application/json")
-        (contentAsJson(result) \ "error").as[String] mustBe "Invalid request payload"
+        contentType(result) mustBe Some("text/plain")
+        contentAsString(result) mustBe "Invalid request payload"
       }
     }
   }
