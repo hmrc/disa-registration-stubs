@@ -16,20 +16,24 @@
 
 package utils
 
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
+import org.mockito.Mockito.when
+import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.*
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.{Application, inject}
+import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.DefaultAwaitTimeout
 import uk.gov.hmrc.auth.core.AuthConnector
+import play.api.{Application, inject}
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 abstract class BaseUnitSpec
     extends AnyWordSpec
@@ -52,4 +56,12 @@ abstract class BaseUnitSpec
   override def fakeApplication(): Application = GuiceApplicationBuilder()
     .overrides(inject.bind[AuthConnector].toInstance(mockAuthConnector))
     .build()
+
+  def authorisedUser(): OngoingStubbing[Future[Unit]] =
+    when(
+      mockAuthConnector.authorise[Unit](
+        any(),
+        any()
+      )(any(), any())
+    ).thenReturn(Future.unit)
 }

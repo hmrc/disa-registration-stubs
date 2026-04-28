@@ -1,5 +1,7 @@
 # microservice specific routes
 
+PUT     /tax-enrolments/subscriptions/:subscriptionId/subscriber    uk.gov.hmrc.disaregistrationstubs.controllers.TaxEnrolmentController.subscribe(subscriptionId: String)
+
 POST    /etmp/enrolment/submission                                  uk.gov.hmrc.disaregistrationstubs.controllers.EtmpController.submitEnrolment()
 
-PUT     /tax-enrolments/subscriptions/:subscriptionId/subscriber    uk.gov.hmrc.disaregistrationstubs.controllers.TaxEnrolmentController.subscribe(subscriptionId: String)
+GET     /journey/:journeyId                                 uk.gov.hmrc.disaregistrationstubs.controllers.GrsController.retrieveJourneyData(journeyId: String)
