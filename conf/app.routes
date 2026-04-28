@@ -4,4 +4,8 @@ PUT     /tax-enrolments/subscriptions/:subscriptionId/subscriber    uk.gov.hmrc.
 
 POST    /etmp/enrolment/submission                                  uk.gov.hmrc.disaregistrationstubs.controllers.EtmpController.submitEnrolment()
 
+
+## GRS/BV Stubs
+
+POST    /incorporated-entity-identification/api/limited-company-journey  uk.gov.hmrc.disaregistrationstubs.controllers.GrsController.createLimitedCompanyJourney()
 GET     /journey/:journeyId                                 uk.gov.hmrc.disaregistrationstubs.controllers.GrsController.retrieveJourneyData(journeyId: String)

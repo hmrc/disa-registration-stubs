@@ -29,8 +29,10 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.DefaultAwaitTimeout
+import play.api.{Application, inject}
 import uk.gov.hmrc.auth.core.AuthConnector
 import play.api.{Application, inject}
+import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -57,11 +59,13 @@ abstract class BaseUnitSpec
     .overrides(inject.bind[AuthConnector].toInstance(mockAuthConnector))
     .build()
 
-  def authorisedUser(): OngoingStubbing[Future[Unit]] =
+  def authorisedUser(credId: Option[String] = None): Unit =
     when(
-      mockAuthConnector.authorise[Unit](
+      mockAuthConnector.authorise(
         any(),
         any()
       )(any(), any())
-    ).thenReturn(Future.unit)
+    ).thenReturn(
+      credId.fold(Future.unit)(credId => Future.successful(Some(Credentials(credId, "GovernmentGateway"))))
+    )
 }

@@ -18,18 +18,59 @@ package uk.gov.hmrc.disaregistrationstubs.controllers
 
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import uk.gov.hmrc.auth.core.retrieve.Credentials
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.credentials
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, AuthorisedFunctions}
+import uk.gov.hmrc.disaregistrationstubs.config.AppConfig
+import uk.gov.hmrc.disaregistrationstubs.models.GrsCreateJourneyRequest
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class GrsController @Inject() (
   cc: ControllerComponents,
-  val authConnector: AuthConnector
+  val authConnector: AuthConnector,
+  appConfig: AppConfig
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with AuthorisedFunctions {
+
+  def createLimitedCompanyJourney(): Action[GrsCreateJourneyRequest] =
+    Action(parse.json[GrsCreateJourneyRequest]).async { implicit request =>
+      authorised()
+        .retrieve(credentials) { creds =>
+          val response = creds match {
+            case None                         => InternalServerError("Internal ID could not be retrieved from Auth")
+            case Some(Credentials(credId, _)) =>
+              credId match {
+                case "grs-create-journey-unauthorised"   => Unauthorized
+                case "grs-create-journey-upstream-error" => InternalServerError
+                case "grs-create-journey-invalid-json"   =>
+                  BadRequest(
+                    Json.obj(
+                      "code"    -> "INVALID_JSON",
+                      "message" -> "Request body is invalid"
+                    )
+                  )
+                case "grs-create-journey-invalid-urls"   =>
+                  BadRequest(Json.toJson("JourneyConfig contained non-relative urls"))
+                case _ if hasInvalidUrls(request.body)   =>
+                  BadRequest(Json.toJson("JourneyConfig contained non-relative urls"))
+                case "grs-create-journey-success" | _    =>
+                  Created(
+                    Json.obj(
+                      "journeyStartUrl" ->
+                        s"${appConfig.disaRegFrontendUrl}/incorporated-identity-callback?journeyId=$credId"
+                    )
+                  )
+              }
+          }
+          Future.successful(response)
+        }
+        .recover { case _: AuthorisationException => Unauthorized }
+    }
 
   def retrieveJourneyData(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
     authorised() {
@@ -180,4 +221,15 @@ class GrsController @Inject() (
       "postal_code"    -> "ZX719AD"
     )
   )
+
+  private def hasInvalidUrls(request: GrsCreateJourneyRequest): Boolean =
+    Seq(
+      request.continueUrl,
+      request.signOutUrl,
+      request.accessibilityUrl
+    ).exists(url => !isValidUrl(url))
+
+  private def isValidUrl(url: String): Boolean =
+    if (appConfig.selfHost.isBlank) url.startsWith("/")
+    else url.startsWith("/") || url.startsWith("http://localhost")
 }

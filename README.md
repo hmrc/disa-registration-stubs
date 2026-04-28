@@ -70,11 +70,37 @@ sbt scalafmt
 ```
 
 ## Endpoints
+
+### POST /incorporated-entity-identification/api/limited-company-journey
+Simulates the GRS create limited company journey endpoint.
+
+The response is driven by the `credId` returned from Auth (derived from the bearer token in tests).
+
+| Scenario                | `credId`                          | Response                      |
+|------------------------|-----------------------------------|-------------------------------|
+| Unauthorized           | `grs-create-journey-unauthorised` | `401 Unauthorized`            |
+| Upstream Error         | `grs-create-journey-upstream-error` | `500 Internal Server Error` |
+| Invalid JSON (stubbed) | `grs-create-journey-invalid-json` | `400 Bad Request`             |
+| Invalid URLs (stubbed) | `grs-create-journey-invalid-urls` | `400 Bad Request`             |
+| Success                | `grs-create-journey-success`      | `201 Created`                 |
+| Success (default)      | any other value                   | `201 Created`                 |
+
+For successful responses, the body will be:
+
+```json
+{
+  "journeyStartUrl": "<disa-reg-frontend>/incorporated-identity-callback?journeyId=<credId>"
+}
+```
+Where `<credId>` is reused as the journeyId for subsequent calls to the journey data retrieval endpoint (see below).
+
 ### GET /journey/:journeyId
 Simulates the GRS/BV journey data retrieval endpoint.
 
-| Scenario                   | `journeyId`               | Response           |
-|----------------------------| ------------------------- | ------------------ |
+This can be triggered directly with calls, or by using the create journey endpoint, using one of the following journeyIds as credId.
+
+| Scenario                   | `journeyId` or `credId`    | Response           |
+|----------------------------|---------------------------| ------------------ |
 | Success                    | `success`                 | `200 OK`           |
 | Identifiers Mismatch       | `identifiers-fail`        | `200 OK`           |
 | Business Verification Fail | `bv-fail`                 | `200 OK`           |
@@ -102,9 +128,3 @@ You can view further information regarding this service via our [service guide](
 ### License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
-
-
-### Endpoints
-
-
-
