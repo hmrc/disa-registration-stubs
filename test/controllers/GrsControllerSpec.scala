@@ -63,7 +63,7 @@ class GrsControllerSpec extends BaseUnitSpec {
       running(fakeApplication()) {
         authorisedUser()
 
-        val result = route(app, journeyRetrievalRequest("success")).get
+        val result = route(app, journeyRetrievalRequest("grs-retrieval-success")).get
 
         status(result) mustBe OK
         (journeyRetrievalJson(result) \ "identifiersMatch").as[Boolean] mustBe true
@@ -77,7 +77,7 @@ class GrsControllerSpec extends BaseUnitSpec {
       running(fakeApplication()) {
         authorisedUser()
 
-        val result = route(app, journeyRetrievalRequest("identifiers-fail")).get
+        val result = route(app, journeyRetrievalRequest("grs-retrieval-identifiers-fail")).get
 
         status(result) mustBe OK
         (journeyRetrievalJson(result) \ "identifiersMatch").as[Boolean] mustBe false
@@ -89,7 +89,7 @@ class GrsControllerSpec extends BaseUnitSpec {
       running(fakeApplication()) {
         authorisedUser()
 
-        val result = route(app, journeyRetrievalRequest("bv-fail")).get
+        val result = route(app, journeyRetrievalRequest("grs-retrieval-bv-fail")).get
 
         status(result) mustBe OK
         (journeyRetrievalJson(result) \ "businessVerification" \ "verificationStatus").as[String] mustBe "FAIL"
@@ -100,7 +100,7 @@ class GrsControllerSpec extends BaseUnitSpec {
       running(fakeApplication()) {
         authorisedUser()
 
-        val result = route(app, journeyRetrievalRequest("bv-not-called")).get
+        val result = route(app, journeyRetrievalRequest("grs-retrieval-bv-not-called")).get
 
         status(result) mustBe OK
         (journeyRetrievalJson(result) \ "businessVerification" \ "verificationStatus").as[String] mustBe "UNCHALLENGED"
@@ -111,7 +111,7 @@ class GrsControllerSpec extends BaseUnitSpec {
       running(fakeApplication()) {
         authorisedUser()
 
-        val result = route(app, journeyRetrievalRequest("bv-ct-enrolled")).get
+        val result = route(app, journeyRetrievalRequest("grs-retrieval-bv-ct-enrolled")).get
 
         status(result) mustBe OK
         (journeyRetrievalJson(result) \ "businessVerification" \ "verificationStatus").as[String] mustBe "CT_ENROLLED"
@@ -122,7 +122,7 @@ class GrsControllerSpec extends BaseUnitSpec {
       running(fakeApplication()) {
         authorisedUser()
 
-        val result = route(app, journeyRetrievalRequest("registration-failed")).get
+        val result = route(app, journeyRetrievalRequest("grs-retrieval-registration-failed")).get
 
         status(result) mustBe OK
         (journeyRetrievalJson(result) \ "registration" \ "registrationStatus").as[String] mustBe "REGISTRATION_FAILED"
@@ -133,7 +133,7 @@ class GrsControllerSpec extends BaseUnitSpec {
       running(fakeApplication()) {
         authorisedUser()
 
-        val result = route(app, journeyRetrievalRequest("registration-not-called")).get
+        val result = route(app, journeyRetrievalRequest("grs-retrieval-registration-not-called")).get
 
         status(result) mustBe OK
         (journeyRetrievalJson(result) \ "registration" \ "registrationStatus")
@@ -145,7 +145,7 @@ class GrsControllerSpec extends BaseUnitSpec {
       running(fakeApplication()) {
         authorisedUser()
 
-        val result = route(app, journeyRetrievalRequest("ct-utr-absent")).get
+        val result = route(app, journeyRetrievalRequest("grs-retrieval-ct-utr-absent")).get
 
         status(result) mustBe OK
         (journeyRetrievalJson(result) \ "ctutr").toOption mustBe None
@@ -156,9 +156,19 @@ class GrsControllerSpec extends BaseUnitSpec {
       running(fakeApplication()) {
         authorisedUser()
 
-        val result = route(app, journeyRetrievalRequest("grs-data-not-found")).get
+        val result = route(app, journeyRetrievalRequest("grs-retrieval-data-not-found")).get
 
         status(result) mustBe NOT_FOUND
+      }
+    }
+
+    "return 401 when journeyId indicates stubbed unauthorised scenario" in {
+      running(fakeApplication()) {
+        authorisedUser()
+
+        val result = route(app, journeyRetrievalRequest("grs-retrieval-unauthorised")).get
+
+        status(result) mustBe UNAUTHORIZED
       }
     }
 
@@ -182,7 +192,7 @@ class GrsControllerSpec extends BaseUnitSpec {
           )(any(), any())
         ).thenReturn(Future.failed(InsufficientEnrolments()))
 
-        val result = route(app, journeyRetrievalRequest("success")).get
+        val result = route(app, journeyRetrievalRequest("grs-retrieval-success")).get
 
         status(result) mustBe UNAUTHORIZED
       }

@@ -77,7 +77,10 @@ class GrsController @Inject() (
 
       val response = journeyId match {
 
-        case "success" =>
+        case "grs-retrieval-unauthorised" =>
+          Unauthorized
+
+        case "grs-retrieval-success" =>
           Ok(
             grsJson(
               identifiersMatch = true,
@@ -87,7 +90,7 @@ class GrsController @Inject() (
             )
           )
 
-        case "identifiers-fail" =>
+        case "grs-retrieval-identifiers-fail" =>
           Ok(
             grsJson(
               identifiersMatch = false,
@@ -96,7 +99,7 @@ class GrsController @Inject() (
             )
           )
 
-        case "bv-fail" =>
+        case "grs-retrieval-bv-fail" =>
           Ok(
             grsJson(
               identifiersMatch = true,
@@ -106,7 +109,7 @@ class GrsController @Inject() (
             )
           )
 
-        case "bv-not-called" =>
+        case "grs-retrieval-bv-not-called" =>
           Ok(
             grsJson(
               identifiersMatch = true,
@@ -116,7 +119,7 @@ class GrsController @Inject() (
             )
           )
 
-        case "bv-ct-enrolled" =>
+        case "grs-retrieval-bv-ct-enrolled" =>
           Ok(
             grsJson(
               identifiersMatch = true,
@@ -126,7 +129,7 @@ class GrsController @Inject() (
             )
           )
 
-        case "registration-failed" =>
+        case "grs-retrieval-registration-failed" =>
           Ok(
             grsJson(
               identifiersMatch = true,
@@ -135,7 +138,7 @@ class GrsController @Inject() (
             )
           )
 
-        case "registration-not-called" =>
+        case "grs-retrieval-registration-not-called" =>
           Ok(
             grsJson(
               identifiersMatch = true,
@@ -144,7 +147,7 @@ class GrsController @Inject() (
             )
           )
 
-        case "ct-utr-absent" =>
+        case "grs-retrieval-ct-utr-absent" =>
           Ok(
             grsJson(
               identifiersMatch = true,
@@ -155,8 +158,10 @@ class GrsController @Inject() (
             )
           )
 
-        case "grs-data-not-found" => NotFound
-        case _                    =>
+        case "grs-retrieval-data-not-found" =>
+          NotFound
+
+        case _ =>
           Ok(
             grsJson(
               identifiersMatch = true,
@@ -168,10 +173,9 @@ class GrsController @Inject() (
       }
 
       Future.successful(response)
+    }.recover { case _: AuthorisationException =>
+      Unauthorized
     }
-      .recover { case _: AuthorisationException =>
-        Unauthorized
-      }
   }
 
   private def grsJson(

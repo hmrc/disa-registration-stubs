@@ -99,19 +99,20 @@ Simulates the GRS/BV journey data retrieval endpoint.
 
 This can be triggered directly with calls, or by using the create journey endpoint, using one of the following journeyIds as credId.
 
-| Scenario                   | `journeyId` or `credId`    | Response           |
-|----------------------------|---------------------------| ------------------ |
-| Success                    | `success`                 | `200 OK`           |
-| Identifiers Mismatch       | `identifiers-fail`        | `200 OK`           |
-| Business Verification Fail | `bv-fail`                 | `200 OK`           |
-| BV Not Called              | `bv-not-called`           | `200 OK`           |
-| CT Enrolled                | `bv-ct-enrolled`          | `200 OK`           |
-| Registration Failed        | `registration-failed`     | `200 OK`           |
-| Registration Not Called    | `registration-not-called` | `200 OK`           |
-| CT UTR Absent              | `ct-utr-absent`           | `200 OK`           |
-| Not Found                  | `grs-data-not-found`      | `404 Not Found`    |
-| Unauthorized               | auth fails                | `401 Unauthorized` |
-| Success (default)          | any other value           | `200 OK`           |
+| Scenario                   | `journeyId` or `credId`              | Response           |
+|----------------------------|--------------------------------------|--------------------|
+| Success                    | `grs-retrieval-success`              | `200 OK`           |
+| Identifiers Mismatch       | `grs-retrieval-identifiers-fail`     | `200 OK`           |
+| Business Verification Fail | `grs-retrieval-bv-fail`              | `200 OK`           |
+| BV Not Called              | `grs-retrieval-bv-not-called`        | `200 OK`           |
+| CT Enrolled                | `grs-retrieval-bv-ct-enrolled`       | `200 OK`           |
+| Registration Failed        | `grs-retrieval-registration-failed`  | `200 OK`           |
+| Registration Not Called    | `grs-retrieval-registration-not-called` | `200 OK`        |
+| CT UTR Absent              | `grs-retrieval-ct-utr-absent`        | `200 OK`           |
+| Not Found                  | `grs-retrieval-data-not-found`       | `404 Not Found`    |
+| Unauthorized (stubbed)     | `grs-retrieval-unauthorised`         | `401 Unauthorized` |
+| Unauthorized (real)        | auth fails                           | `401 Unauthorized` |
+| Success (default)          | any other value                      | `200 OK`           |
 
 ### PUT /tax-enrolments/subscriptions/:subscriptionId/subscriber
 
