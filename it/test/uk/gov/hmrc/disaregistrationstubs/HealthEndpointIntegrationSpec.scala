@@ -19,10 +19,12 @@ package uk.gov.hmrc.disaregistrationstubs
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
-import play.api.Application
+import play.api.{Application, inject}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
+import uk.gov.hmrc.auth.core.AuthConnector
 
 class HealthEndpointIntegrationSpec
   extends AnyWordSpec
@@ -31,12 +33,15 @@ class HealthEndpointIntegrationSpec
      with IntegrationPatience
      with GuiceOneServerPerSuite {
 
-  private val wsClient = app.injector.instanceOf[WSClient]
-  private val baseUrl  = s"http://localhost:$port"
+  val mockAuthConnector: AuthConnector = mock[AuthConnector]
 
   override def fakeApplication(): Application =
     GuiceApplicationBuilder()
+      .overrides(inject.bind[AuthConnector].toInstance(mockAuthConnector))
       .build()
+
+  private val wsClient = app.injector.instanceOf[WSClient]
+  private val baseUrl  = s"http://localhost:$port"
 
   "service health endpoint" should {
     "respond with 200 status" in {

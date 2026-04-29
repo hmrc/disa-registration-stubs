@@ -23,9 +23,10 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
+import play.api.{Application, inject}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.DefaultAwaitTimeout
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext
@@ -44,8 +45,11 @@ abstract class BaseUnitSpec
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   implicit val hc: HeaderCarrier    = HeaderCarrier()
 
+  val mockAuthConnector: AuthConnector = mock[AuthConnector]
+
   override def beforeEach(): Unit = Mockito.reset()
 
   override def fakeApplication(): Application = GuiceApplicationBuilder()
+    .overrides(inject.bind[AuthConnector].toInstance(mockAuthConnector))
     .build()
 }
