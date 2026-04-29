@@ -20,12 +20,14 @@ import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
+import scala.jdk.CollectionConverters._
+
 @Singleton
 class AppConfig @Inject() (servicesConfig: ServicesConfig, config: Configuration) {
 
   val appName: String = config.get[String]("appName")
 
-  val selfHost: String = config.get("host")
-
   val disaRegFrontendUrl: String = servicesConfig.baseUrl("disa-registration-frontend")
+  
+  val allowedHosts: Set[String] = config.underlying.getStringList("microservice.hosts.allowList").asScala.toSet
 }

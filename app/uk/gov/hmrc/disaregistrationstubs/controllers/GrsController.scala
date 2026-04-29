@@ -24,6 +24,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, AuthorisedF
 import uk.gov.hmrc.disaregistrationstubs.config.AppConfig
 import uk.gov.hmrc.disaregistrationstubs.models.GrsCreateJourneyRequest
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.play.bootstrap.binders.{AbsoluteWithHostnameFromAllowlist, OnlyRelative}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -62,7 +63,7 @@ class GrsController @Inject() (
                   Created(
                     Json.obj(
                       "journeyStartUrl" ->
-                        s"${appConfig.disaRegFrontendUrl}/incorporated-identity-callback?journeyId=$credId"
+                        s"/obligations/enrolment/isa/incorporated-identity-callback?journeyId=$credId"
                     )
                   )
               }
@@ -234,6 +235,5 @@ class GrsController @Inject() (
     ).exists(url => !isValidUrl(url))
 
   private def isValidUrl(url: String): Boolean =
-    if (appConfig.selfHost.isBlank) url.startsWith("/")
-    else url.startsWith("/") || url.startsWith("http://localhost")
+    OnlyRelative.applies(url) || AbsoluteWithHostnameFromAllowlist.apply(appConfig.allowedHosts).applies(url)
 }
