@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.disaregistrationstubs.controllers
 
+import play.api.Logging
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.retrieve.Credentials
@@ -36,30 +37,47 @@ class GrsController @Inject() (
   appConfig: AppConfig
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
-    with AuthorisedFunctions {
+    with AuthorisedFunctions
+    with Logging {
 
   def createLimitedCompanyJourney(): Action[GrsCreateJourneyRequest] =
     Action(parse.json[GrsCreateJourneyRequest]).async { implicit request =>
       authorised()
         .retrieve(credentials) { creds =>
           val response = creds match {
-            case None                         => InternalServerError("Internal ID could not be retrieved from Auth")
+            case None =>
+              logger.warn("Credentials could not be retrieved from Auth when creating GRS journey")
+              InternalServerError("Internal ID could not be retrieved from Auth")
+
             case Some(Credentials(credId, _)) =>
               credId match {
-                case "grs-create-journey-unauthorised"   => Unauthorized
-                case "grs-create-journey-upstream-error" => InternalServerError
-                case "grs-create-journey-invalid-json"   =>
+                case "grs-create-journey-unauthorised" =>
+                  logger.info("Returning stubbed unauthorized response for create GRS journey")
+                  Unauthorized
+
+                case "grs-create-journey-upstream-error" =>
+                  logger.info("Returning stubbed upstream error response for create GRS journey")
+                  InternalServerError
+
+                case "grs-create-journey-invalid-json" =>
+                  logger.info("Returning stubbed invalid JSON response for create GRS journey")
                   BadRequest(
                     Json.obj(
                       "code"    -> "INVALID_JSON",
                       "message" -> "Request body is invalid"
                     )
                   )
-                case "grs-create-journey-invalid-urls"   =>
+
+                case "grs-create-journey-invalid-urls" =>
+                  logger.info("Returning stubbed invalid URLs response for create GRS journey")
                   BadRequest(Json.toJson("JourneyConfig contained non-relative urls"))
-                case _ if hasInvalidUrls(request.body)   =>
+
+                case _ if hasInvalidUrls(request.body) =>
+                  logger.warn(s"Create GRS journey request contained invalid URLs for credId: $credId")
                   BadRequest(Json.toJson("JourneyConfig contained non-relative urls"))
-                case "grs-create-journey-success" | _    =>
+
+                case "grs-create-journey-success" | _ =>
+                  logger.info(s"Returning created GRS journey response for credId: $credId")
                   Created(
                     Json.obj(
                       "journeyStartUrl" ->
@@ -70,7 +88,10 @@ class GrsController @Inject() (
           }
           Future.successful(response)
         }
-        .recover { case _: AuthorisationException => Unauthorized }
+        .recover { case _: AuthorisationException =>
+          logger.warn("Authorisation failed when creating GRS journey")
+          Unauthorized
+        }
     }
 
   def retrieveJourneyData(journeyId: String): Action[AnyContent] = Action.async { implicit request =>
@@ -79,9 +100,11 @@ class GrsController @Inject() (
       val response = journeyId match {
 
         case "grs-retrieval-unauthorised" =>
+          logger.info("Returning stubbed unauthorized response for GRS journey data retrieval")
           Unauthorized
 
         case "grs-retrieval-success" =>
+          logger.info("Returning GRS retrieval success scenario")
           Ok(
             grsJson(
               identifiersMatch = true,
@@ -91,36 +114,8 @@ class GrsController @Inject() (
             )
           )
 
-        case "grs-retrieval-identifiers-fail" =>
-          Ok(
-            grsJson(
-              identifiersMatch = false,
-              bvStatus = Some("UNCHALLENGED"),
-              registrationStatus = "REGISTRATION_FAILED"
-            )
-          )
-
-        case "grs-retrieval-bv-fail" =>
-          Ok(
-            grsJson(
-              identifiersMatch = true,
-              bvStatus = Some("FAIL"),
-              registrationStatus = "REGISTERED",
-              bpId = Some("111111")
-            )
-          )
-
-        case "grs-retrieval-bv-not-called" =>
-          Ok(
-            grsJson(
-              identifiersMatch = true,
-              bvStatus = Some("UNCHALLENGED"),
-              registrationStatus = "REGISTERED",
-              bpId = Some("111111")
-            )
-          )
-
-        case "grs-retrieval-bv-ct-enrolled" =>
+        case "grs-retrieval-success-ct-enrolled" =>
+          logger.info("Returning GRS retrieval CT enrolled success scenario")
           Ok(
             grsJson(
               identifiersMatch = true,
@@ -130,39 +125,43 @@ class GrsController @Inject() (
             )
           )
 
-        case "grs-retrieval-registration-failed" =>
-          Ok(
-            grsJson(
-              identifiersMatch = true,
-              bvStatus = Some("UNCHALLENGED"),
-              registrationStatus = "REGISTRATION_FAILED"
-            )
-          )
-
-        case "grs-retrieval-registration-not-called" =>
-          Ok(
-            grsJson(
-              identifiersMatch = true,
-              bvStatus = None,
-              registrationStatus = "REGISTRATION_NOT_CALLED"
-            )
-          )
-
-        case "grs-retrieval-ct-utr-absent" =>
+        case "grs-retrieval-bv-fail" =>
+          logger.info("Returning GRS retrieval business verification fail scenario")
           Ok(
             grsJson(
               identifiersMatch = true,
               bvStatus = Some("FAIL"),
-              registrationStatus = "REGISTERED",
-              bpId = Some("111111"),
-              includeCtutr = false
+              registrationStatus = "REGISTRATION_NOT_CALLED",
+              bpId = None
+            )
+          )
+
+        case "grs-retrieval-registration-failed" =>
+          logger.info("Returning GRS retrieval registration failed scenario")
+          Ok(
+            grsJson(
+              identifiersMatch = true,
+              bvStatus = Some("PASS"),
+              registrationStatus = "REGISTRATION_FAILED"
+            )
+          )
+
+        case "grs-retrieval-absent-utr" =>
+          logger.info("Returning GRS retrieval absent UTR scenario")
+          Ok(
+            grsJson(
+              identifiersMatch = false,
+              bvStatus = Some("UNCHALLENGED"),
+              registrationStatus = "REGISTRATION_NOT_CALLED"
             )
           )
 
         case "grs-retrieval-data-not-found" =>
+          logger.info("Returning GRS retrieval data not found scenario")
           NotFound
 
         case _ =>
+          logger.info(s"Returning default GRS retrieval success scenario for journeyId: $journeyId")
           Ok(
             grsJson(
               identifiersMatch = true,
@@ -175,6 +174,7 @@ class GrsController @Inject() (
 
       Future.successful(response)
     }.recover { case _: AuthorisationException =>
+      logger.warn(s"Authorisation failed when retrieving GRS journey data for journeyId: $journeyId")
       Unauthorized
     }
   }

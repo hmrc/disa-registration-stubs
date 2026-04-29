@@ -28,6 +28,6 @@ class AppConfig @Inject() (servicesConfig: ServicesConfig, config: Configuration
   val appName: String = config.get[String]("appName")
 
   val disaRegFrontendUrl: String = servicesConfig.baseUrl("disa-registration-frontend")
-  
+
   val allowedHosts: Set[String] = config.underlying.getStringList("microservice.hosts.allowList").asScala.toSet
 }

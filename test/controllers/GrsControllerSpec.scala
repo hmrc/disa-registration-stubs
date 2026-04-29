@@ -30,7 +30,7 @@ import scala.concurrent.Future
 class GrsControllerSpec extends BaseUnitSpec {
 
   private def journeyRetrievalRequest(journeyId: String) =
-    FakeRequest(GET, s"/journey/$journeyId")
+    FakeRequest(GET, s"/incorporated-entity-identification/api/journey/$journeyId")
 
   private def journeyRetrievalJson(result: Future[play.api.mvc.Result]): JsValue =
     contentAsJson(result)
@@ -73,15 +73,17 @@ class GrsControllerSpec extends BaseUnitSpec {
       }
     }
 
-    "return identifiers mismatch scenario" in {
+    "return 200 with CT enrolled success payload" in {
       running(fakeApplication()) {
         authorisedUser()
 
-        val result = route(app, journeyRetrievalRequest("grs-retrieval-identifiers-fail")).get
+        val result = route(app, journeyRetrievalRequest("grs-retrieval-success-ct-enrolled")).get
 
         status(result) mustBe OK
-        (journeyRetrievalJson(result) \ "identifiersMatch").as[Boolean] mustBe false
-        (journeyRetrievalJson(result) \ "registration" \ "registrationStatus").as[String] mustBe "REGISTRATION_FAILED"
+        (journeyRetrievalJson(result) \ "identifiersMatch").as[Boolean] mustBe true
+        (journeyRetrievalJson(result) \ "registration" \ "registrationStatus").as[String] mustBe "REGISTERED"
+        (journeyRetrievalJson(result) \ "businessVerification" \ "verificationStatus").as[String] mustBe "CT_ENROLLED"
+        (journeyRetrievalJson(result) \ "registration" \ "registeredBusinessPartnerId").as[String] mustBe "111111"
       }
     }
 
@@ -92,29 +94,11 @@ class GrsControllerSpec extends BaseUnitSpec {
         val result = route(app, journeyRetrievalRequest("grs-retrieval-bv-fail")).get
 
         status(result) mustBe OK
+        (journeyRetrievalJson(result) \ "identifiersMatch").as[Boolean] mustBe true
         (journeyRetrievalJson(result) \ "businessVerification" \ "verificationStatus").as[String] mustBe "FAIL"
-      }
-    }
-
-    "return BV not called (UNCHALLENGED)" in {
-      running(fakeApplication()) {
-        authorisedUser()
-
-        val result = route(app, journeyRetrievalRequest("grs-retrieval-bv-not-called")).get
-
-        status(result) mustBe OK
-        (journeyRetrievalJson(result) \ "businessVerification" \ "verificationStatus").as[String] mustBe "UNCHALLENGED"
-      }
-    }
-
-    "return CT enrolled scenario" in {
-      running(fakeApplication()) {
-        authorisedUser()
-
-        val result = route(app, journeyRetrievalRequest("grs-retrieval-bv-ct-enrolled")).get
-
-        status(result) mustBe OK
-        (journeyRetrievalJson(result) \ "businessVerification" \ "verificationStatus").as[String] mustBe "CT_ENROLLED"
+        (journeyRetrievalJson(result) \ "registration" \ "registrationStatus")
+          .as[String] mustBe "REGISTRATION_NOT_CALLED"
+        (journeyRetrievalJson(result) \ "registration" \ "registeredBusinessPartnerId").toOption mustBe None
       }
     }
 
@@ -125,30 +109,24 @@ class GrsControllerSpec extends BaseUnitSpec {
         val result = route(app, journeyRetrievalRequest("grs-retrieval-registration-failed")).get
 
         status(result) mustBe OK
+        (journeyRetrievalJson(result) \ "identifiersMatch").as[Boolean] mustBe true
+        (journeyRetrievalJson(result) \ "businessVerification" \ "verificationStatus").as[String] mustBe "PASS"
         (journeyRetrievalJson(result) \ "registration" \ "registrationStatus").as[String] mustBe "REGISTRATION_FAILED"
+        (journeyRetrievalJson(result) \ "registration" \ "registeredBusinessPartnerId").toOption mustBe None
       }
     }
 
-    "return registration not called scenario" in {
+    "return absent UTR scenario" in {
       running(fakeApplication()) {
         authorisedUser()
 
-        val result = route(app, journeyRetrievalRequest("grs-retrieval-registration-not-called")).get
+        val result = route(app, journeyRetrievalRequest("grs-retrieval-absent-utr")).get
 
         status(result) mustBe OK
+        (journeyRetrievalJson(result) \ "identifiersMatch").as[Boolean] mustBe false
+        (journeyRetrievalJson(result) \ "businessVerification" \ "verificationStatus").as[String] mustBe "UNCHALLENGED"
         (journeyRetrievalJson(result) \ "registration" \ "registrationStatus")
           .as[String] mustBe "REGISTRATION_NOT_CALLED"
-      }
-    }
-
-    "return response without ctutr when ct-utr-absent" in {
-      running(fakeApplication()) {
-        authorisedUser()
-
-        val result = route(app, journeyRetrievalRequest("grs-retrieval-ct-utr-absent")).get
-
-        status(result) mustBe OK
-        (journeyRetrievalJson(result) \ "ctutr").toOption mustBe None
       }
     }
 
@@ -179,7 +157,9 @@ class GrsControllerSpec extends BaseUnitSpec {
         val result = route(app, journeyRetrievalRequest("something-random")).get
 
         status(result) mustBe OK
+        (journeyRetrievalJson(result) \ "identifiersMatch").as[Boolean] mustBe true
         (journeyRetrievalJson(result) \ "registration" \ "registrationStatus").as[String] mustBe "REGISTERED"
+        (journeyRetrievalJson(result) \ "businessVerification" \ "verificationStatus").as[String] mustBe "PASS"
       }
     }
 
@@ -209,19 +189,19 @@ class GrsControllerSpec extends BaseUnitSpec {
 
         status(result) mustBe CREATED
         (journeyRetrievalJson(result) \ "journeyStartUrl").as[String] mustBe
-          "http://localhost:1202/incorporated-identity-callback?journeyId=grs-create-journey-success"
+          "/obligations/enrolment/isa/incorporated-identity-callback?journeyId=grs-create-journey-success"
       }
     }
 
     "return 201 with journeyStartUrl using GRS retrieval scenario credId" in {
       running(fakeApplication()) {
-        authorisedUser(Some("bv-fail"))
+        authorisedUser(Some("grs-retrieval-bv-fail"))
 
         val result = route(app, createLimitedCompanyJourneyRequest()).get
 
         status(result) mustBe CREATED
         (journeyRetrievalJson(result) \ "journeyStartUrl").as[String] mustBe
-          "http://localhost:1202/incorporated-identity-callback?journeyId=bv-fail"
+          "/obligations/enrolment/isa/incorporated-identity-callback?journeyId=grs-retrieval-bv-fail"
       }
     }
 
