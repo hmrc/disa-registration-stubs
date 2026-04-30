@@ -25,13 +25,12 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.DefaultAwaitTimeout
 import play.api.{Application, inject}
 import uk.gov.hmrc.auth.core.AuthConnector
-import play.api.{Application, inject}
 import uk.gov.hmrc.auth.core.retrieve.Credentials
+import uk.gov.hmrc.disaregistrationstubs.connectors.RegistrationConnector
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -50,12 +49,16 @@ abstract class BaseUnitSpec
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   implicit val hc: HeaderCarrier    = HeaderCarrier()
 
-  val mockAuthConnector: AuthConnector = mock[AuthConnector]
+  val mockAuthConnector: AuthConnector                 = mock[AuthConnector]
+  val mockRegistrationConnector: RegistrationConnector = mock[RegistrationConnector]
 
-  override def beforeEach(): Unit = Mockito.reset()
+  override def beforeEach(): Unit = Mockito.reset(mockAuthConnector, mockRegistrationConnector)
 
   override def fakeApplication(): Application = GuiceApplicationBuilder()
-    .overrides(inject.bind[AuthConnector].toInstance(mockAuthConnector))
+    .overrides(
+      inject.bind[AuthConnector].toInstance(mockAuthConnector),
+      inject.bind[RegistrationConnector].toInstance(mockRegistrationConnector)
+    )
     .build()
 
   def authorisedUser(credId: Option[String] = None): Unit =

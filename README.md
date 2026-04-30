@@ -69,9 +69,25 @@ sbt scalafmtSbt
 sbt scalafmt
 ```
 
-## Endpoints
+### Endpoints
 
-## Endpoints
+### PUT /tax-enrolments/subscriptions/:subscriptionId/subscriber
+
+This endpoint allows for simulation of tax enrolment subscription and an associated asynchronous callback.
+The `credId` used in the generation of the bearer token is used to select the scenario.
+
+| Scenario | `credId` | Subscriber response | Callback triggered | Callback state |
+| --- | --- | --- | --- | --- |
+| Success | `tax-enrolment-success` or anything except specific test values | `204 No Content` | Yes | `SUCCEEDED` |
+| Issuer failure | `tax-enrolment-issuer-failure` | `204 No Content` | Yes | `ERROR` |
+| Enrolment error | `tax-enrolment-enrolment-error` | `204 No Content` | Yes | `EnrolmentError` |
+| Enrolled | `tax-enrolment-enrolled` | `204 No Content` | Yes | `Enrolled` |
+| Auth refreshed | `tax-enrolment-auth-refreshed` | `204 No Content` | Yes | `AuthRefreshed` |
+| Bad request | `tax-enrolment-bad-request` | `400 Bad Request` | No | N/A |
+| Internal server error | `tax-enrolment-internal-server-error` | `500 Internal Server Error` | No | N/A |
+| Unauthorized | Auth fails or no credentials | `401 Unauthorized` | No | N/A |
+
+For callback scenarios, the subscriber endpoint returns `204 No Content` independently of the callback result. The callback is triggered separately using the `callback` URL from the request payload.
 
 ### POST /incorporated-entity-identification/api/limited-company-journey
 Simulates the GRS create limited company journey endpoint.
@@ -111,15 +127,7 @@ This can be triggered directly with calls, or by using the create journey endpoi
 | Not Found                  | `grs-retrieval-data-not-found`      | `404 Not Found`    | No journey data found for the given ID                                      |
 | Unauthorized (stubbed)     | `grs-retrieval-unauthorised`        | `401 Unauthorized` | Explicit stubbed unauthorized response                                      |
 | Unauthorized (real)        | auth fails                          | `401 Unauthorized` | Real authorization failure (e.g. missing or invalid credentials)            |
-| Success (default)          | any other value                     | `200 OK`           | Defaults to typical success response                                        |
-
-### PUT /tax-enrolments/subscriptions/:subscriptionId/subscriber
-
-| Scenario     | `credId`                             | Response           |
-| ------------ | ------------------------------------ | ------------------ |
-| Success      | anything except specific test values | `204 No Content`   |
-| Bad Request  | `tax-enrolment-bad-request`          | `400 Bad Request`  |
-| Unauthorized | auth fails or no credentials         | `401 Unauthorized` |
+| Success (default)          | any other value                     | `200 OK`           | Defaults to typical success response       
 
 ### Further documentation
 
