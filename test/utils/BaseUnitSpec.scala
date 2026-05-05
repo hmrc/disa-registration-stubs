@@ -16,20 +16,25 @@
 
 package utils
 
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
+import org.mockito.Mockito.when
 import org.scalatest.*
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.{Application, inject}
+import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.DefaultAwaitTimeout
+import play.api.{Application, inject}
 import uk.gov.hmrc.auth.core.AuthConnector
+import play.api.{Application, inject}
+import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 abstract class BaseUnitSpec
     extends AnyWordSpec
@@ -52,4 +57,14 @@ abstract class BaseUnitSpec
   override def fakeApplication(): Application = GuiceApplicationBuilder()
     .overrides(inject.bind[AuthConnector].toInstance(mockAuthConnector))
     .build()
+
+  def authorisedUser(credId: Option[String] = None): Unit =
+    when(
+      mockAuthConnector.authorise(
+        any(),
+        any()
+      )(any(), any())
+    ).thenReturn(
+      credId.fold(Future.unit)(credId => Future.successful(Some(Credentials(credId, "GovernmentGateway"))))
+    )
 }

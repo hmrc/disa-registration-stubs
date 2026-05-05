@@ -68,18 +68,52 @@ sbt scalafmtSbt
 # formats just the main source files (excludes test and configuration files)
 sbt scalafmt
 ```
-### Further documentation
 
-You can view further information regarding this service via our [service guide](#).
+## Endpoints
 
-### License
+## Endpoints
 
-This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
+### POST /incorporated-entity-identification/api/limited-company-journey
+Simulates the GRS create limited company journey endpoint.
 
+The response is driven by the `credId` returned from Auth.
 
-### Endpoints
+| Scenario                | `credId`                            | Response                      |
+|-------------------------|-------------------------------------|-------------------------------|
+| Unauthorized            | `grs-create-journey-unauthorised`   | `401 Unauthorized`            |
+| Upstream Error          | `grs-create-journey-upstream-error` | `500 Internal Server Error`   |
+| Invalid JSON (stubbed)  | `grs-create-journey-invalid-json`   | `400 Bad Request`             |
+| Invalid URLs (stubbed)  | `grs-create-journey-invalid-urls`   | `400 Bad Request`             |
+| Success                 | `grs-create-journey-success`        | `201 Created`                 |
+| Success (default)       | any other value                     | `201 Created`                 |
 
-#### PUT /tax-enrolments/subscriptions/:subscriptionId/subscriber
+For successful responses, the body will be:
+
+```json
+{
+  "journeyStartUrl": "/obligations/enrolment/isa/incorporated-identity-callback?journeyId=<credId>"
+}
+```
+Where `<credId>` is reused as the journeyId for subsequent calls to the journey data retrieval endpoint (see below).
+
+### GET /journey/:journeyId
+Simulates the GRS/BV journey data retrieval endpoint.
+
+This can be triggered directly with calls, or by using the create journey endpoint with one of the following retrieval journey IDs as the Auth `credId`.
+
+| Scenario                   | `journeyId` or `credId`             | Response           | Description                                                                 |
+|----------------------------|-------------------------------------|--------------------|-----------------------------------------------------------------------------|
+| Success                    | `grs-retrieval-success`             | `200 OK`           | Typical success case with user going through GRS and BV                     |
+| Success (CT Enrolled)      | `grs-retrieval-success-ct-enrolled` | `200 OK`           | Success case for users with IR-CT enrolment, fast-tracked through BV        |
+| Business Verification Fail | `grs-retrieval-bv-fail`             | `200 OK`           | Failure in BV journey resulting in lockout                                  |
+| Registration Failed        | `grs-retrieval-registration-failed` | `200 OK`           | Successful verification but failure to register user with ETMP              |
+| Absent UTR                 | `grs-retrieval-absent-utr`          | `200 OK`           | Edge case that can occur with Registered Societies                          |
+| Not Found                  | `grs-retrieval-data-not-found`      | `404 Not Found`    | No journey data found for the given ID                                      |
+| Unauthorized (stubbed)     | `grs-retrieval-unauthorised`        | `401 Unauthorized` | Explicit stubbed unauthorized response                                      |
+| Unauthorized (real)        | auth fails                          | `401 Unauthorized` | Real authorization failure (e.g. missing or invalid credentials)            |
+| Success (default)          | any other value                     | `200 OK`           | Defaults to typical success response                                        |
+
+### PUT /tax-enrolments/subscriptions/:subscriptionId/subscriber
 
 | Scenario     | `credId`                             | Response           |
 | ------------ | ------------------------------------ | ------------------ |
@@ -87,4 +121,10 @@ This code is open source software licensed under the [Apache 2.0 License]("http:
 | Bad Request  | `tax-enrolment-bad-request`          | `400 Bad Request`  |
 | Unauthorized | auth fails or no credentials         | `401 Unauthorized` |
 
+### Further documentation
 
+You can view further information regarding this service via our [service guide](#).
+
+### License
+
+This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
