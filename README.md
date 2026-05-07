@@ -129,6 +129,30 @@ This can be triggered directly with calls, or by using the create journey endpoi
 | Unauthorized (real)        | auth fails                          | `401 Unauthorized` | Real authorization failure (e.g. missing or invalid credentials)            |
 | Success (default)          | any other value                     | `200 OK`           | Defaults to typical success response       
 
+### POST /address-lookup/lookup
+
+Simulates the Address Lookup lookup-by-postcode endpoint.
+
+The response is driven by the `postcode` submitted in the request. The optional `filter` field performs a substring match against address lines.
+
+| Scenario                 | `postcode`  | `filter`      | Response           | Description                                      |
+|--------------------------|-------------|---------------|--------------------|--------------------------------------------------|
+| No results               | `ZZ00 1ZZ`  | not supplied  | `200 OK`           | Returns an empty JSON array                      |
+| Single result            | `ZZ11 1ZZ`  | not supplied  | `200 OK`           | Returns one address record                       |
+| Multiple results         | `ZZ22 2ZZ`  | not supplied  | `200 OK`           | Returns multiple address records                 |
+| Filtered single result   | `ZZ22 2ZZ`  | `10`          | `200 OK`           | Returns only addresses containing `10`           |
+| Filtered no results      | `ZZ22 2ZZ`  | no match      | `200 OK`           | Returns an empty JSON array                      |
+| No results default       | any other value | any value | `200 OK`           | Defaults to an empty JSON array                  |
+
+#### Request body
+
+```json
+{
+  "postcode": "ZZ11 1ZZ",
+  "filter": "10"
+}
+```
+
 ### Further documentation
 
 You can view further information regarding this service via our [service guide](#).

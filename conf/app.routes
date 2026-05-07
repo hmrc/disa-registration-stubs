@@ -4,6 +4,7 @@ PUT     /tax-enrolments/subscriptions/:subscriptionId/subscriber    uk.gov.hmrc.
 
 POST    /etmp/enrolment/submission                                  uk.gov.hmrc.disaregistrationstubs.controllers.EtmpController.submitEnrolment()
 
+POST    /address-lookup/lookup                                      uk.gov.hmrc.disaregistrationstubs.controllers.AddressLookupController.lookup()
 
 ## GRS/BV Stubs
 
