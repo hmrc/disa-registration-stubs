@@ -56,7 +56,7 @@ class EtmpControllerSpec extends BaseUnitSpec {
         contentType(result) mustBe Some("application/json")
 
         val response = contentAsJson(result).as[EnrolmentSubmissionResponse]
-        response.receiptId.nonEmpty mustBe true
+        response.subscriptionId.nonEmpty mustBe true
       }
     }
 
@@ -81,7 +81,7 @@ class EtmpControllerSpec extends BaseUnitSpec {
         contentType(result) mustBe Some("application/json")
 
         val response = contentAsJson(result).as[EnrolmentSubmissionResponse]
-        response.receiptId.nonEmpty mustBe true
+        response.subscriptionId.nonEmpty mustBe true
       }
     }
 
