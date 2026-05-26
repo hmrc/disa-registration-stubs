@@ -26,13 +26,12 @@ import javax.inject.{Inject, Singleton}
 
 @Singleton
 class EmailVerificationController @Inject() (
-                                              cc: ControllerComponents
-                                            ) extends BackendController(cc)
-  with Logging {
+  cc: ControllerComponents
+) extends BackendController(cc)
+    with Logging {
 
   def sendCode(): Action[SendCodeV2Request] =
     Action(parse.json[SendCodeV2Request]) { implicit request =>
-
       request.body.email match {
 
         case "code-not-sent@test.com" =>
@@ -68,7 +67,6 @@ class EmailVerificationController @Inject() (
 
   def verifyCode(): Action[VerifyCodeV2Request] =
     Action(parse.json[VerifyCodeV2Request]) { implicit request =>
-
       val code = request.body.verificationCode
 
       code match {

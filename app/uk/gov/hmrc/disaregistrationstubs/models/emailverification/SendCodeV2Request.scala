@@ -26,7 +26,6 @@ package uk.gov.hmrc.disaregistrationstubs.models.emailverification
  *     http://www.apache.org/licenses/LICENSE-2.0
  */
 
-
 import play.api.libs.json.*
 
 case class SendCodeV2Request(email: String)
@@ -42,18 +41,18 @@ object SendCodeResult {
 }
 
 case class VerifyCodeV2Request(
-                                email: String,
-                                verificationCode: String
-                              )
+  email: String,
+  verificationCode: String
+)
 
 object VerifyCodeV2Request {
   implicit val format: OFormat[VerifyCodeV2Request] = Json.format[VerifyCodeV2Request]
 }
 
 case class VerifyCodeResult(
-                             status: String,
-                             message: Option[String]
-                           )
+  status: String,
+  message: Option[String]
+)
 
 object VerifyCodeResult {
   implicit val format: OFormat[VerifyCodeResult] = Json.format[VerifyCodeResult]
