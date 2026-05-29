@@ -1,0 +1,44 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.disaregistrationstubs.models
+
+import play.api.libs.json.{Json, OFormat}
+
+import java.time.Instant
+
+case class Identifier(key: String, value: String)
+object Identifier {
+  implicit val format: OFormat[Identifier] = Json.format[Identifier]
+}
+case class TaxEnrollmentSubs(
+                              created: Instant,
+                              lastModified: Instant,
+                              credId: Option[String] = Some("d8474a25-71b6-45ed-859e-77dd5f087be6"),
+                              serviceName: String = "516b9976-00fd-4da6-b59c-4d09054912bb",
+                              identifiers: Option[Seq[Identifier]],
+                              callback: Option[String],
+                              state: String,
+                              etmpId: Option[String] = Some("da4053bf-2ea3-4cb8-bb9c-65b70252b656"),
+                              errorResponse: Option[String] = None,
+                              groupIdentifier: Option[String] = None
+                            )
+
+object TaxEnrollmentSubs {
+  
+  implicit val format: OFormat[TaxEnrollmentSubs] = Json.format[TaxEnrollmentSubs]
+}
+
