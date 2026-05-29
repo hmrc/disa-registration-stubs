@@ -24,7 +24,8 @@ import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.disaregistrationstubs.connectors.RegistrationConnector
 import uk.gov.hmrc.disaregistrationstubs.controllers.TaxEnrolmentController.*
-import uk.gov.hmrc.disaregistrationstubs.models.{TaxEnrolmentCallbackRequest, TaxEnrolmentSubscriberRequest}
+import uk.gov.hmrc.disaregistrationstubs.helpers.TaxEnrolmentControllerHelper
+import uk.gov.hmrc.disaregistrationstubs.models.{TaxEnrollmentSubs, TaxEnrolmentCallbackRequest, TaxEnrolmentSubscriberRequest}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -39,7 +40,8 @@ class TaxEnrolmentController @Inject() (
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with AuthorisedFunctions
-    with Logging {
+    with Logging
+    with TaxEnrolmentControllerHelper {
 
   def subscribe(subscriptionId: String): Action[JsValue] =
     Action.async(parse.json) { implicit request =>
@@ -66,6 +68,24 @@ class TaxEnrolmentController @Inject() (
         .recover { case e: AuthorisationException =>
           logger.warn(s"Authorise call failed for Tax Enrolments formBundleId: [$subscriptionId]", e)
           Unauthorized
+        }
+    }
+
+
+  def checkGroupIdSubscription(groupId: String): Action[JsValue] =
+    Action.async(parse.json) { implicit request =>
+      authorised() {
+        groupId match {
+             case "groupId-state-succeeded" => Future.successful(Ok(Json.toJson(makeResponse(groupIdSucceeded, SucceededState))))
+
+            case "groupId-state-pending" => Future.successful(Ok(Json.toJson(makeResponse(groupIdPending, PendingState))))
+
+            case "groupId-state-offline" => Future.successful(Ok(Json.toJson(makeResponse(groupIdOffline, OfflineState))))
+
+            case "groupId-state-error" => Future.successful(Ok(Json.toJson(makeResponse(groupIdError, ErrorState))))
+
+            case _ => Future.successful(Ok(Json.toJson(Seq.empty[String])))
+          }
         }
     }
 
@@ -184,9 +204,16 @@ object TaxEnrolmentController {
   // Transport responses
   private val BadRequestCredId          = "tax-enrolment-bad-request"
   private val InternalServerErrorCredId = "tax-enrolment-internal-server-error"
+  // Groud Ids
+  private val groupIdSucceeded          = "groupId-state-succeeded"
+  private val groupIdError              = "groupId-state-error"
+  private val groupIdPending            = "groupId-state-pending"
+  private val groupIdOffline            = "groupId-state-offline"
   // Enrolment states
   private val SucceededState            = "SUCCEEDED"
   private val ErrorState                = "ERROR"
+  private val PendingState              = "PENDING"
+  private val OfflineState              = "OFFLINE"
   private val EnrolmentErrorState       = "EnrolmentError"
   private val EnrolledState             = "Enrolled"
   private val AuthRefreshedState        = "AuthRefreshed"

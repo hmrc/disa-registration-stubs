@@ -24,7 +24,6 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.credentials
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, AuthorisedFunctions}
 import uk.gov.hmrc.disaregistrationstubs.config.AppConfig
 import uk.gov.hmrc.disaregistrationstubs.models.GrsCreateJourneyRequest
-import uk.gov.hmrc.disaregistrationstubs.utils.jsonComposer
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.bootstrap.binders.{AbsoluteWithHostnameFromAllowlist, OnlyRelative}
 
@@ -39,8 +38,7 @@ class GrsController @Inject() (
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with AuthorisedFunctions
-    with Logging
-    with jsonComposer {
+    with Logging {
 
   def createLimitedCompanyJourney(): Action[GrsCreateJourneyRequest] =
     Action(parse.json[GrsCreateJourneyRequest]).async { implicit request =>
@@ -178,27 +176,6 @@ class GrsController @Inject() (
     }.recover { case _: AuthorisationException =>
       logger.warn(s"Authorisation failed when retrieving GRS journey data for journeyId: $journeyId")
       Unauthorized
-    }
-  }
-
-  def checkGroupIdSubscription(groupId: String): Action[AnyContent] = Action.async { implicit request =>
-    authorised() {
-      val response = groupId match {
-        case "groupId-state-succeeded" => Ok(succeededObj)
-
-        case "groupId-state-pending" => Ok(pendingObj)
-
-        case "groupId-state-offline" => NoContent
-
-        case "groupId-state-error" => Ok(offlineObj)
-
-        case _ => Ok(Json.toJson(Seq.empty[String]))
-
-        case null => InternalServerError("Internal Server Error. Group ID is null")
-
-      }
-
-      Future.successful(response)
     }
   }
 
