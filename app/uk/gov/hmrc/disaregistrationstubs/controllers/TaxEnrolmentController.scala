@@ -72,8 +72,8 @@ class TaxEnrolmentController @Inject() (
     }
 
 
-  def checkGroupIdSubscription(groupId: String): Action[JsValue] =
-    Action.async(parse.json) { implicit request =>
+  def checkGroupIdSubscription(groupId: String): Action[AnyContent] =
+    Action.async { implicit request =>
       authorised() {
         groupId match {
              case "groupId-state-succeeded" => Future.successful(Ok(Json.toJson(makeResponse(groupIdSucceeded, SucceededState))))
