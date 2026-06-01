@@ -24,15 +24,13 @@ trait TaxEnrolmentControllerHelper {
 
   private val mockIdentifiers = groupIdIdentifier("ZREF", "Z0001")
 
-  private val mockIdentifiers1 = groupIdIdentifier("ZREF", "`Z0002`")
-
 
   def makeResponse(groupId: String, state: String): Seq[TaxEnrollmentSubs] = {
     Seq(
       TaxEnrollmentSubs(
         Instant.now,
         Instant.now,
-        identifiers = Some(Seq(mockIdentifiers1, mockIdentifiers)),
+        identifiers = Some(Seq(mockIdentifiers)),
         Some("url passed in by the subscriber service"),
         state,
         Some("da4053bf-2ea3-4cb8-bb9c-65b70252b656"),
