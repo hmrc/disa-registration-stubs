@@ -22,22 +22,23 @@ import java.time.Instant
 
 trait TaxEnrolmentControllerHelper {
 
-  private val mockIdentifiers = groupIdIdentifier("f52b4104-7e69-4bb8-baec-5aaf9897e849", "97541e00-a712-452b-af21-0be4db0b7b1d")
+  private val mockIdentifiers = groupIdIdentifier("ZREF", "Z0001")
 
-  private val mockIdentifiers1 = groupIdIdentifier("d3e222b8-b9ff-4571-8f83-1a0fbc221195", "547d7434-8c33-431d-bffa-35a7d1103c30")
+  private val mockIdentifiers1 = groupIdIdentifier("ZREF", "Z0001")
 
 
-  def makeResponse(groupId: String, state: String): TaxEnrollmentSubs = {
-
-    TaxEnrollmentSubs(
-      Instant.now,
-      Instant.now,
-      identifiers = Some(Seq(mockIdentifiers1, mockIdentifiers)),
-      Some("url passed in by the subscriber service"),
-      state,
-      Some("da4053bf-2ea3-4cb8-bb9c-65b70252b656"),
-      errorResponse = if (state == "ERROR") Some("error message") else None,
-      groupIdentifier = Some(groupId)
+  def makeResponse(groupId: String, state: String): Seq[TaxEnrollmentSubs] = {
+    Seq(
+      TaxEnrollmentSubs(
+        Instant.now,
+        Instant.now,
+        identifiers = Some(Seq(mockIdentifiers1, mockIdentifiers)),
+        Some("url passed in by the subscriber service"),
+        state,
+        Some("da4053bf-2ea3-4cb8-bb9c-65b70252b656"),
+        errorResponse = if (state == "ERROR") Some("error message") else None,
+        groupIdentifier = Some(groupId)
+      )
     )
   }
 
