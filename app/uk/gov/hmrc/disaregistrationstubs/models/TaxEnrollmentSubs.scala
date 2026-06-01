@@ -28,7 +28,7 @@ case class TaxEnrollmentSubs(
                               created: Instant,
                               lastModified: Instant,
                               credId: Option[String] = Some("d8474a25-71b6-45ed-859e-77dd5f087be6"),
-                              serviceName: String = "516b9976-00fd-4da6-b59c-4d09054912bb",
+                              serviceName: String = "HMRC-DISA-ORG",
                               identifiers: Option[Seq[groupIdIdentifier]],
                               callback: Option[String],
                               state: String,
