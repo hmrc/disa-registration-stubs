@@ -21,24 +21,25 @@ import play.api.libs.json.{Json, OFormat}
 import java.time.Instant
 
 case class groupIdIdentifier(key: String, value: String)
+
 object groupIdIdentifier {
   implicit val format: OFormat[groupIdIdentifier] = Json.format[groupIdIdentifier]
 }
+
 case class TaxEnrollmentSubs(
-                              created: Instant,
-                              lastModified: Instant,
-                              credId: Option[String] = Some("d8474a25-71b6-45ed-859e-77dd5f087be6"),
-                              serviceName: String = "HMRC-DISA-ORG",
-                              identifiers: Option[Seq[groupIdIdentifier]],
-                              callback: Option[String],
-                              state: String,
-                              etmpId: Option[String] = Some("da4053bf-2ea3-4cb8-bb9c-65b70252b656"),
-                              errorResponse: Option[String] = None,
-                              groupIdentifier: Option[String] = None
-                            )
+  created: Instant,
+  lastModified: Instant,
+  credId: Option[String] = Some("d8474a25-71b6-45ed-859e-77dd5f087be6"),
+  serviceName: String = "HMRC-DISA-ORG",
+  identifiers: Option[Seq[groupIdIdentifier]],
+  callback: Option[String],
+  state: String,
+  etmpId: Option[String] = Some("da4053bf-2ea3-4cb8-bb9c-65b70252b656"),
+  errorResponse: Option[String] = None,
+  groupIdentifier: Option[String] = None
+)
 
 object TaxEnrollmentSubs {
-  
+
   implicit val format: OFormat[TaxEnrollmentSubs] = Json.format[TaxEnrollmentSubs]
 }
-

@@ -71,7 +71,6 @@ class TaxEnrolmentController @Inject() (
         }
     }
 
-
   def checkGroupIdSubscription(groupId: String): Action[AnyContent] =
     Action.async { implicit request =>
       authorised() {
@@ -84,13 +83,13 @@ class TaxEnrolmentController @Inject() (
           case "groupId-state-error" => Future.successful(Ok(Json.toJson(makeResponse(groupIdError, ErrorState))))
 
           case "groupId-notfound" => Future.successful(Ok(Json.toJson(Seq.empty[String])))
-          
+
           case null | " " => Future.successful(InternalServerError)
-          
+
           case aGroupId => Future.successful(Ok(Json.toJson(makeResponse(aGroupId, SucceededState))))
-          
-          }
+
         }
+      }
     }
 
   private def handleScenario(
