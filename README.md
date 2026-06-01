@@ -172,7 +172,6 @@ Available identifier keys and values:
 | keys   | `values` |
 |--------|----------|
 | ZREF   | `Z0001`  |
-| ZREF   | `Z0002`  |
 
 ### POST /email-verification/v2/send-code
 
