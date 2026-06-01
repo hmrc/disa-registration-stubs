@@ -167,6 +167,13 @@ The response is driven by the `groupId` returned from Auth.
 | Success (not found)       | `groupId-notfound `     | `200 Empty JSON` | No state       |
 | Internal Server Error     | null                    | `500`            | No state       |
 
+Available identifier keys and values:
+
+| keys   | `values` |
+|--------|----------|
+| ZREF   | `Z0001`  |
+| ZREF   | `Z0002`  |
+
 ### POST /email-verification/v2/send-code
 
 Simulates sending an email verification code.
