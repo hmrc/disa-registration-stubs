@@ -20,16 +20,16 @@ import play.api.libs.json.{Json, OFormat}
 
 import java.time.Instant
 
-case class Identifier(key: String, value: String)
-object Identifier {
-  implicit val format: OFormat[Identifier] = Json.format[Identifier]
+case class groupIdIdentifier(key: String, value: String)
+object groupIdIdentifier {
+  implicit val format: OFormat[groupIdIdentifier] = Json.format[groupIdIdentifier]
 }
 case class TaxEnrollmentSubs(
                               created: Instant,
                               lastModified: Instant,
                               credId: Option[String] = Some("d8474a25-71b6-45ed-859e-77dd5f087be6"),
                               serviceName: String = "516b9976-00fd-4da6-b59c-4d09054912bb",
-                              identifiers: Option[Seq[Identifier]],
+                              identifiers: Option[Seq[groupIdIdentifier]],
                               callback: Option[String],
                               state: String,
                               etmpId: Option[String] = Some("da4053bf-2ea3-4cb8-bb9c-65b70252b656"),

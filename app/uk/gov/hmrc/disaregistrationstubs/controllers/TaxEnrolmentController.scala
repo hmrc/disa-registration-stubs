@@ -77,15 +77,13 @@ class TaxEnrolmentController @Inject() (
       authorised() {
         groupId match {
 
-          case "groupId-state-succeeded" => Future.successful(Ok(Json.toJson(makeResponse(groupIdSucceeded, SucceededState))))
-
           case "groupId-state-pending" => Future.successful(Ok(Json.toJson(makeResponse(groupIdPending, PendingState))))
 
           case "groupId-state-offline" => Future.successful(Ok(Json.toJson(makeResponse(groupIdOffline, OfflineState))))
 
           case "groupId-state-error" => Future.successful(Ok(Json.toJson(makeResponse(groupIdError, ErrorState))))
 
-          case "groupId-state-succeeded-notfound" => Future.successful(Ok(Json.toJson(Seq.empty[String])))
+          case "groupId-notfound" => Future.successful(Ok(Json.toJson(Seq.empty[String])))
 
           case aGroupId => Future.successful(Ok(Json.toJson(makeResponse(aGroupId, SucceededState))))
 

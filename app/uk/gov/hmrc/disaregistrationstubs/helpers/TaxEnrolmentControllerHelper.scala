@@ -16,15 +16,15 @@
 
 package uk.gov.hmrc.disaregistrationstubs.helpers
 
-import uk.gov.hmrc.disaregistrationstubs.models.{Identifier, TaxEnrollmentSubs}
+import uk.gov.hmrc.disaregistrationstubs.models.{TaxEnrollmentSubs, groupIdIdentifier}
 
 import java.time.Instant
 
 trait TaxEnrolmentControllerHelper {
 
-  private val mockIdentifiers = Identifier("f52b4104-7e69-4bb8-baec-5aaf9897e849", "97541e00-a712-452b-af21-0be4db0b7b1d")
+  private val mockIdentifiers = groupIdIdentifier("f52b4104-7e69-4bb8-baec-5aaf9897e849", "97541e00-a712-452b-af21-0be4db0b7b1d")
 
-  private val mockIdentifiers1 = Identifier("d3e222b8-b9ff-4571-8f83-1a0fbc221195", "547d7434-8c33-431d-bffa-35a7d1103c30")
+  private val mockIdentifiers1 = groupIdIdentifier("d3e222b8-b9ff-4571-8f83-1a0fbc221195", "547d7434-8c33-431d-bffa-35a7d1103c30")
 
 
   def makeResponse(groupId: String, state: String): TaxEnrollmentSubs = {
