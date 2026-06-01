@@ -28,5 +28,9 @@ trait TaxEnrolmentControllerSpecHelper {
     groupIdentifier = Some("testGroudId")
   ))
 
+  val expectedPendingState: Seq[TaxEnrollmentSubs] = Seq(expectedSucceededState.head.copy(state = "PENDING",groupIdentifier =Some("groupId-state-pending")))
+
+  val expectedOfflineState: Seq[TaxEnrollmentSubs] = Seq(expectedSucceededState.head.copy(state = "OFFLINE",groupIdentifier =Some("groupId-state-offline")))
+  
   val expectedNotFoundState: Seq[TaxEnrollmentSubs] = Seq()
 }

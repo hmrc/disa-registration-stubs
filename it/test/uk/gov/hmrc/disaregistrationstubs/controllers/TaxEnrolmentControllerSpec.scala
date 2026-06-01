@@ -76,7 +76,7 @@ class TaxEnrolmentControllerSpec
 
       response.status shouldBe 200
       json shouldBe expected
-    } //expectedNotFoundState
+    }
 
     "respond with 200 status and a not found state payload" in {
 
@@ -94,6 +94,53 @@ class TaxEnrolmentControllerSpec
 
       response.status shouldBe 200
       json shouldBe expected
+    }
+    "respond with 200 status and a groupId-state-pending state payload" in {
+
+      val response = {
+        wsClient
+          .url(s"$baseUrl/tax-enrolments/groups/groupId-state-pending/subscriptions")
+          .get()
+          .futureValue
+
+      }
+
+      println(response.body)
+      val json = stripFields(Json.parse(response.body).as[JsArray], "created", "lastModified")
+      val expected = stripFields(Json.toJson(expectedPendingState).as[JsArray], "created", "lastModified")
+
+      response.status shouldBe 200
+      json shouldBe expected
+    }
+    "respond with 200 status and a groupId-state-offline state payload" in {
+
+      val response = {
+        wsClient
+          .url(s"$baseUrl/tax-enrolments/groups/groupId-state-offline/subscriptions")
+          .get()
+          .futureValue
+
+      }
+
+      println(response.body)
+      val json = stripFields(Json.parse(response.body).as[JsArray], "created", "lastModified")
+      val expected = stripFields(Json.toJson(expectedOfflineState).as[JsArray], "created", "lastModified")
+
+      response.status shouldBe 200
+      json shouldBe expected
+    }
+
+    "respond with 500 status if groupId isn't specified" in {
+
+      val response = {
+        wsClient
+          .url(s"$baseUrl/tax-enrolments/groups/ /subscriptions")
+          .get()
+          .futureValue
+
+      }
+
+      response.status shouldBe 500
     }
   }
 
