@@ -158,14 +158,14 @@ Simulates the tax-enrolment, retrieve subscription by groupId, endpoint.
 
 The response is driven by the `groupId` returned from Auth.
 
-| Scenario                  | `groupId`                          | Response                    | Callback state |
-|---------------------------|------------------------------------|-----------------------------|----------------|
-| Success                   | `groupId-state-succeeded`          | `200 with JSON`             | `SUCCEEDED`    |
-| Success (status: pending) | `groupId-state-pending`            | `200 with JSON`             | `PENDING`      |
-| Success (status: offline) | `groupId-state-offline`            | `200 with JSON`             | `OFFLINE`      |
-| Success ((status: error)  | `groupId-state-error`              | `200 with JSON`             | `ERROR`        |
-| Success (not found)       | `groupId-state-succeeded-notfound` | `200 Empty JSON`            | No state       |
-| Upstream Error            | any other group Id                 | `500 Internal Server Error` | No state       |
+| Scenario                  | `groupId`                          | Response         | Callback state |
+|---------------------------|------------------------------------|------------------|----------------|
+| Success                   | `groupId-state-succeeded`          | `200 with JSON`  | `SUCCEEDED`    |
+| Success (status: pending) | `groupId-state-pending`            | `200 with JSON`  | `PENDING`      |
+| Success (status: offline) | `groupId-state-offline`            | `200 with JSON`  | `OFFLINE`      |
+| Success (status: error)   | `groupId-state-error`              | `200 with JSON`  | `ERROR`        |
+| Success (not found)       | `groupId-state-succeeded-notfound` | `200 Empty JSON` | No state       |
+| Success                   | any other group Id                 | `200 with JSON`  | `SUCCEEDED`    |
 
 ### Further documentation
 
