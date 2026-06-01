@@ -24,7 +24,7 @@ trait TaxEnrolmentControllerHelper {
 
   private val mockIdentifiers = groupIdIdentifier("ZREF", "Z0001")
 
-  private val mockIdentifiers1 = groupIdIdentifier("ZREF", "Z0001")
+  private val mockIdentifiers1 = groupIdIdentifier("ZREF", "`Z0002`")
 
 
   def makeResponse(groupId: String, state: String): Seq[TaxEnrollmentSubs] = {
