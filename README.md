@@ -152,6 +152,7 @@ The response is driven by the `postcode` submitted in the request. The optional 
   "filter": "10"
 }
 ```
+
 ### GET     /tax-enrolments/groups/:groupId/subscriptions
 
 Simulates the tax-enrolment, retrieve subscription by groupId, endpoint.
@@ -166,6 +167,33 @@ The response is driven by the `groupId` returned from Auth.
 | Success (status: error)   | `groupId-state-error`              | `200 with JSON`  | `ERROR`        |
 | Success (not found)       | `groupId-state-succeeded-notfound` | `200 Empty JSON` | No state       |
 | Success                   | any other group Id                 | `200 with JSON`  | `SUCCEEDED`    |
+=======
+### POST /email-verification/v2/send-code
+
+Simulates sending an email verification code.
+
+The response is driven by the email field in the request body.
+
+| Scenario          | `email`                  | Response                                                                                   | HTTP Status                 | Description                       |
+| ----------------- | ------------------------ | ------------------------------------------------------------------------------------------ | --------------------------- | --------------------------------- |
+| Code not sent     | `code-not-sent@test.com` | `{ "status": "CODE_NOT_SENT" }`                                                            | `400 Bad Request`           | Simulates failure to send code    |
+| Internal error    | `server-error@test.com`  | No body                                                                                    | `500 Internal Server Error` | Simulates upstream/system failure |
+| Success (default) | any other value          | `{ "status": "CODE_SENT", "message": "Email containing verification code has been sent" }` | `200 OK`                    | Successful send                   |
+
+### POST /email-verification/v2/verify-code
+
+Simulates verification of an email verification code.
+
+The response is driven by the verificationCode field in the request body.
+
+| Scenario        | `verificationCode` | Response                                                                                                | HTTP Status                 | Description                       |
+| --------------- | ------------------ | ------------------------------------------------------------------------------------------------------- | --------------------------- | --------------------------------- |
+| Verified        | `ABCDEF`           | `{ "status": "CODE_VERIFIED", "message": "The verification code for the email verified successfully" }` | `200 OK`                    | Successful verification           |
+| Not validated   | `NOTVAL`           | `{ "status": "CODE_NOT_VALIDATED" }`                                                                    | `400 Bad Request`           | Code failed validation            |
+| Not found       | `NOTFND`           | `{ "status": "CODE_NOT_FOUND", "message": "Verification code not found" }`                              | `404 Not Found`             | Code not found or expired         |
+| Internal error  | `SERERR`           | No body                                                                                                 | `500 Internal Server Error` | Simulates upstream/system failure |
+| Default failure | any other value    | `{ "status": "CODE_NOT_VALIDATED", "message": "Invalid verification code" }`                            | `400 Bad Request`           | Unknown/invalid code              |
+
 
 ### Further documentation
 
