@@ -83,8 +83,10 @@ class TaxEnrolmentController @Inject() (
             case "groupId-state-offline" => Future.successful(Ok(Json.toJson(makeResponse(groupIdOffline, OfflineState))))
 
             case "groupId-state-error" => Future.successful(Ok(Json.toJson(makeResponse(groupIdError, ErrorState))))
+             
+            case "groupId-state-succeeded-notfound" => Future.successful(Ok(Json.toJson(Seq.empty[String])))
 
-            case _ => Future.successful(Ok(Json.toJson(Seq.empty[String])))
+            case _ => Future.successful(InternalServerError)
           }
         }
     }
