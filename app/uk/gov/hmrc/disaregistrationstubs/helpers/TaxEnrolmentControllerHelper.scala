@@ -33,7 +33,7 @@ trait TaxEnrolmentControllerHelper {
       Instant.now,
       Instant.now,
       identifiers = Some(Seq(mockIdentifiers1, mockIdentifiers)),
-      Some("https://example.com"),
+      Some("url passed in by the subscriber service"),
       state,
       Some("da4053bf-2ea3-4cb8-bb9c-65b70252b656"),
       errorResponse = if (state == "ERROR") Some("error message") else None,
