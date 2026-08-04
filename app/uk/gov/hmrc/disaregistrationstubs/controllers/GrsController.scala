@@ -54,7 +54,6 @@ class GrsController @Inject() (
 
   def createLimitedLiabilityPartnershipJourney(): Action[GrsCreateJourneyRequest] = createJourney()
 
-
   private def createJourney(): Action[GrsCreateJourneyRequest] =
     Action(parse.json[GrsCreateJourneyRequest]).async { implicit request =>
       authorised()
