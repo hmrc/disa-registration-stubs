@@ -121,7 +121,7 @@ For successful responses, the body will be:
 
 ```json
 {
-  "journeyStartUrl": "/obligations/enrolment/isa/incorporated-identity-callback?journeyId=<credId>"
+  "journeyStartUrl": "/register-for-manage-isas/incorporated-identity-callback?journeyId=<credId>"
 }
 ```
 Where `<credId>` is reused as the journeyId for subsequent calls to the journey data retrieval endpoints (see below).
