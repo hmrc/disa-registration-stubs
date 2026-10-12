@@ -29,6 +29,8 @@ import scala.concurrent.Future
 
 class GrsControllerSpec extends BaseUnitSpec {
 
+  val registrationPrefix = "/register-for-manage-isas"
+
   private def incorporatedEntityJourneyRetrievalRequest(journeyId: String) =
     FakeRequest(GET, s"/incorporated-entity-identification/api/journey/$journeyId")
 
@@ -335,7 +337,7 @@ class GrsControllerSpec extends BaseUnitSpec {
 
         status(result) mustBe CREATED
         (journeyRetrievalJson(result) \ "journeyStartUrl").as[String] mustBe
-          "/obligations/enrolment/isa/incorporated-identity-callback?journeyId=grs-create-journey-success"
+          s"$registrationPrefix/incorporated-identity-callback?journeyId=grs-create-journey-success"
       }
     }
 
@@ -347,7 +349,7 @@ class GrsControllerSpec extends BaseUnitSpec {
 
         status(result) mustBe CREATED
         (journeyRetrievalJson(result) \ "journeyStartUrl").as[String] mustBe
-          "/obligations/enrolment/isa/incorporated-identity-callback?journeyId=grs-retrieval-bv-fail"
+          s"$registrationPrefix/incorporated-identity-callback?journeyId=grs-retrieval-bv-fail"
       }
     }
 
@@ -461,7 +463,7 @@ class GrsControllerSpec extends BaseUnitSpec {
 
         status(result) mustBe CREATED
         (journeyRetrievalJson(result) \ "journeyStartUrl").as[String] mustBe
-          "/obligations/enrolment/isa/incorporated-identity-callback?journeyId=grs-create-journey-success"
+          s"$registrationPrefix/incorporated-identity-callback?journeyId=grs-create-journey-success"
       }
     }
 

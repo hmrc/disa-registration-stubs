@@ -95,7 +95,7 @@ class GrsController @Inject() (
                   Created(
                     Json.obj(
                       "journeyStartUrl" ->
-                        s"/obligations/enrolment/isa/incorporated-identity-callback?journeyId=$credId"
+                        s"/register-for-manage-isas/incorporated-identity-callback?journeyId=$credId"
                     )
                   )
               }
