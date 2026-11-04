@@ -30,17 +30,13 @@ class EtmpControllerSpec extends BaseUnitSpec {
 
   "EtmpController.submitEnrolment" should {
 
-    "must return 200 with EnrolmentSubmissionResponse when request is valid and p2pPlatform is not 'submit failure'" in {
+    "must return 200 with EnrolmentSubmissionResponse when request is valid and fcaNumber is not '0000000'" in {
       running(fakeApplication()) {
         val body = Json.parse(
           """
             |{
             |  "groupId": "group-123",
-            |  "isaProducts": {
-            |    "isaProducts": {
-            |      "p2pPlatform": "test"
-            |    }
-            |  }
+            |  "providerDetails": { "fcaNumber": "1234567" }
             |}
             |""".stripMargin
         )
@@ -61,7 +57,7 @@ class EtmpControllerSpec extends BaseUnitSpec {
       }
     }
 
-    "must return 200 with EnrolmentSubmissionResponse when request is valid and p2pPlatform is empty" in {
+    "must return 400 when fcaNumber is absent" in {
       running(fakeApplication()) {
         val body = Json.parse(
           """
@@ -78,26 +74,19 @@ class EtmpControllerSpec extends BaseUnitSpec {
 
         val result = route(app, request).get
 
-        status(result) mustBe OK
+        status(result) mustBe BAD_REQUEST
         contentType(result) mustBe Some("application/json")
-
-        val response = contentAsJson(result).as[EnrolmentSubmissionResponse]
-        response.formBundleId.nonEmpty mustBe true
-        response.formBundleId.matches("""\d{12}""") mustBe true
+        (contentAsJson(result) \ "error").as[String] mustBe "Invalid request payload"
       }
     }
 
-    "must return 502 when request is valid and p2pPlatform is 'submit failure'" in {
+    "must return 502 when request is valid and fcaNumber is '0000000'" in {
       running(fakeApplication()) {
         val body = Json.parse(
           """
             |{
             |  "groupId": "group-123",
-            |  "isaProducts": {
-            |    "isaProducts": {
-            |      "p2pPlatform": "submit failure"
-            |    }
-            |  }
+            |  "providerDetails": { "fcaNumber": "0000000" }
             |}
             |""".stripMargin
         )

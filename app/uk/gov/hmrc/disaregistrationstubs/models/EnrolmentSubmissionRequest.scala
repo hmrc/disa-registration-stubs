@@ -19,11 +19,11 @@ package uk.gov.hmrc.disaregistrationstubs.models
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json._
 
-case class EnrolmentSubmissionRequest(groupId: String, p2pPlatform: Option[String])
+case class EnrolmentSubmissionRequest(groupId: String, fcaNumber: String)
 
 object EnrolmentSubmissionRequest {
   implicit val reads: Reads[EnrolmentSubmissionRequest] = {
     (__ \ "groupId").read[String] and
-      (__ \\ "isaProducts" \ "p2pPlatform").readNullable[String]
-  }.apply((groupId, p2pPlatform) => EnrolmentSubmissionRequest(groupId, p2pPlatform))
+      (__ \ "providerDetails" \ "fcaNumber").read[String]
+  }.apply((groupId, fcaNumber) => EnrolmentSubmissionRequest(groupId, fcaNumber))
 }
