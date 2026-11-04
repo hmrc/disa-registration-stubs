@@ -32,8 +32,8 @@ class EtmpController @Inject() (
   def submitEnrolment(): Action[JsValue] = Action(parse.json) { implicit request =>
     request.body.validate[EnrolmentSubmissionRequest] match {
       case JsSuccess(req, _) =>
-        req.p2pPlatform match {
-          case Some("submit failure") =>
+        req.fcaNumber match {
+          case "0000000" =>
             logger.info(s"Submission failure response triggered for groupId: [${req.groupId}]")
             BadGateway(Json.obj("error" -> "Downstream error from ETMP stub"))
 

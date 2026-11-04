@@ -71,6 +71,10 @@ sbt scalafmt
 
 ### Endpoints
 
+### POST /etmp/enrolment/submission
+
+A request with `providerDetails.fcaNumber` exactly equal to `0000000` returns `502 Bad Gateway` with `{ "error": "Downstream error from ETMP stub" }`. Other FCA numbers return `200 OK` with a generated form bundle ID. A missing FCA number returns `400 Bad Request`.
+
 ### PUT /tax-enrolments/subscriptions/:subscriptionId/subscriber
 
 This endpoint allows for simulation of tax enrolment subscription and an associated asynchronous callback.
