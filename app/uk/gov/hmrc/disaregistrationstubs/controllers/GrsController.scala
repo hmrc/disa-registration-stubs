@@ -115,6 +115,15 @@ class GrsController @Inject() (
           logger.info("Returning stubbed unauthorized response for GRS journey data retrieval")
           Unauthorized
 
+        case "grs-retrieval-success-no-registered-address" =>
+          val response = grsJson(
+            identifiersMatch = true,
+            bvStatus = Some("PASS"),
+            registrationStatus = "REGISTERED",
+            bpId = Some("111111")
+          )
+          Ok(response ++ Json.obj("companyProfile" -> (companyProfileJson - "unsanitisedCHROAddress")))
+
         case "grs-retrieval-success" =>
           logger.info("Returning GRS retrieval success scenario")
           Ok(
@@ -191,6 +200,16 @@ class GrsController @Inject() (
         case "grs-retrieval-unauthorised" =>
           logger.info("Returning stubbed unauthorized response for partnership journey data retrieval")
           Unauthorized
+
+        case "grs-retrieval-success-no-registered-address" =>
+          val response = partnershipJson(
+            identifiersMatch = true,
+            bvStatus = Some("PASS"),
+            registrationStatus = "REGISTERED",
+            bpId = Some("111111"),
+            includeCompanyProfile = true
+          )
+          Ok(response ++ Json.obj("companyProfile" -> (companyProfileJson - "unsanitisedCHROAddress")))
 
         case "grs-retrieval-success" =>
           logger.info("Returning partnership retrieval success scenario")

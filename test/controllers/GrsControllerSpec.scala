@@ -110,6 +110,20 @@ class GrsControllerSpec extends BaseUnitSpec {
       }
     }
 
+    "return successful company details without a registered address" in {
+      running(fakeApplication()) {
+        authorisedUser()
+        val result =
+          route(app, incorporatedEntityJourneyRetrievalRequest("grs-retrieval-success-no-registered-address")).get
+        status(result) mustBe OK
+        val json   = journeyRetrievalJson(result)
+        (json \ "companyProfile" \ "companyName").as[String] mustBe "Test Ltd"
+        (json \ "companyProfile" \ "unsanitisedCHROAddress").toOption mustBe None
+        (json \ "registration" \ "registrationStatus").as[String] mustBe "REGISTERED"
+        (json \ "businessVerification" \ "verificationStatus").as[String] mustBe "PASS"
+      }
+    }
+
     "return BV fail scenario" in {
       running(fakeApplication()) {
         authorisedUser()
@@ -234,6 +248,19 @@ class GrsControllerSpec extends BaseUnitSpec {
         (journeyRetrievalJson(result) \ "identifiersMatch").as[Boolean] mustBe true
         (journeyRetrievalJson(result) \ "companyProfile" \ "companyNumber").as[String] mustBe "12345678"
         (journeyRetrievalJson(result) \ "registration" \ "registrationStatus").as[String] mustBe "REGISTERED"
+      }
+    }
+
+    "return successful payload details without a registered address for incorporated partnership types" in {
+      running(fakeApplication()) {
+        authorisedUser()
+        val result = route(app, partnershipJourneyRetrievalRequest("grs-retrieval-success-no-registered-address")).get
+        status(result) mustBe OK
+        val json   = journeyRetrievalJson(result)
+        (json \ "companyProfile" \ "companyName").as[String] mustBe "Test Ltd"
+        (json \ "companyProfile" \ "unsanitisedCHROAddress").toOption mustBe None
+        (json \ "registration" \ "registrationStatus").as[String] mustBe "REGISTERED"
+        (json \ "businessVerification" \ "verificationStatus").as[String] mustBe "PASS"
       }
     }
 

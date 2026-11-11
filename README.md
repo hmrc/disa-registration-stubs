@@ -140,6 +140,7 @@ This can be triggered directly with calls, or by using the create journey endpoi
 | Scenario                   | `journeyId` or `credId`             | Response           | Description                                                          |
 |----------------------------|-------------------------------------|--------------------|----------------------------------------------------------------------|
 | Success                    | `grs-retrieval-success`             | `200 OK`           | Typical success case with user going through GRS and BV              |
+| Success (without registered address) | `grs-retrieval-success-no-registered-address` | `200 OK` | Successful verification and registration with company information retained and `companyProfile.unsanitisedCHROAddress` omitted |
 | Success (CT Enrolled)      | `grs-retrieval-success-ct-enrolled` | `200 OK`           | Success case for users with IR-CT enrolment, fast-tracked through BV |
 | Business Verification Fail | `grs-retrieval-bv-fail`             | `200 OK`           | Failure in BV journey resulting in lockout                           |
 | Registration Failed        | `grs-retrieval-registration-failed` | `200 OK`           | Successful verification but failure to register user with ETMP       |
@@ -160,6 +161,7 @@ This can be triggered directly with calls, or by using the create journey endpoi
 | Scenario                                | `journeyId` or `credId`                            | Response           | Description                                                                              |
 |------------------------------------------|-----------------------------------------------------|--------------------|-------------------------------------------------------------------------------------------|
 | Success                                  | `grs-retrieval-success`                             | `200 OK`           | Typical success case for General/Scottish Partnership (no `companyProfile`)               |
+| Success (without registered address) | `grs-retrieval-success-no-registered-address` | `200 OK` | Successful verification and registration with company information retained and `companyProfile.unsanitisedCHROAddress` omitted |
 | Success (with company profile)           | `grs-retrieval-success-incorporated-partnership`    | `200 OK`           | Typical success case for Limited/Scottish Limited Partnership/LLP (includes `companyProfile`) |
 | Business Verification Fail               | `grs-retrieval-bv-fail`                             | `200 OK`           | Failure in BV journey                                                                      |
 | Registration Failed                      | `grs-retrieval-registration-failed`                 | `200 OK`           | Successful verification but failure to register, including a `failures` array             |
