@@ -2,20 +2,6 @@
 # disa-registration-stubs
 App Description to be confirmed
 
-### Before running the app
-
-This repository relies on having mongodb running locally. You can start it with:
-
-```bash
-# first check to see if mongo is already running
-docker ps | grep mongodb
-
-# if not, start it
-docker run --restart unless-stopped --name mongodb -p 27017:27017 -d percona/percona-server-mongodb:7.0 --replSet rs0
-```
-
-Reference instructions for [setting up docker](https://docs.tax.service.gov.uk/mdtp-handbook/documentation/developer-set-up/install-docker.html) and [running mongodb](https://docs.tax.service.gov.uk/mdtp-handbook/documentation/developer-set-up/set-up-mongodb.html#install-mongodb-applesilicon-mac).
-
 ### Running the app
 
 ```bash
